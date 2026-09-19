@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from chess_app.application.session import Session
+from chess_app.domain.session import Session
 
 
 class InMemorySessionRepository:

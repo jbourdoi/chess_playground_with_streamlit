@@ -3,11 +3,11 @@ from uuid import UUID
 
 import pytest
 
-from chess_app.application.session import (
-    Session,
+from chess_app.application.session_service import (
     SessionService,
     hash_session_token,
 )
+from chess_app.domain.session import Session
 from chess_app.infrastructure.session.in_memory_session import (
     InMemorySessionRepository,
 )

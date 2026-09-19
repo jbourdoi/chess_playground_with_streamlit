@@ -1,7 +1,7 @@
 from datetime import timedelta
 from uuid import uuid4
 
-from chess_app.application.session import Session
+from chess_app.domain.session import Session
 from chess_app.infrastructure.session.in_memory_session import (
     InMemorySessionRepository,
 )

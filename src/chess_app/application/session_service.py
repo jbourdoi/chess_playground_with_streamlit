@@ -3,59 +3,15 @@ from __future__ import annotations
 import hashlib
 import secrets
 from collections.abc import Callable
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from uuid import UUID, uuid4
 
+from chess_app.domain.session import Session
 from chess_app.ports.session import SessionRepository
 
 DEFAULT_SESSION_TTL = timedelta(days=30)
 SESSION_TOKEN_BYTES = 32
-
-
-@dataclass(frozen=True, slots=True)
-class Session:
-    """Represent an authenticated user session."""
-
-    session_id: UUID
-    user_id: UUID
-    created_at: datetime
-    last_seen_at: datetime
-    expires_at: datetime
-
-    def __post_init__(self) -> None:
-        """Validate session timestamps."""
-        timestamps = (
-            self.created_at,
-            self.last_seen_at,
-            self.expires_at,
-        )
-
-        if any(timestamp.tzinfo is None for timestamp in timestamps):
-            raise ValueError("session timestamps must be timezone-aware")
-
-        if self.last_seen_at < self.created_at:
-            raise ValueError("last_seen_at cannot be before created_at")
-
-        if self.expires_at <= self.created_at:
-            raise ValueError("expires_at must be after created_at")
-
-    def is_expired(self, now: datetime) -> bool:
-        """Return whether the session has expired."""
-        return now >= self.expires_at
-
-    def touch(self, now: datetime) -> Session:
-        """Return a new session with an updated last-seen timestamp."""
-        if self.is_expired(now):
-            raise ValueError("cannot touch an expired session")
-
-        if now < self.last_seen_at:
-            raise ValueError("last_seen_at cannot move backwards")
-
-        return replace(
-            self,
-            last_seen_at=now,
-        )
 
 
 @dataclass(frozen=True, slots=True)

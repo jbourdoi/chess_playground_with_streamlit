@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Protocol
+from typing import Protocol
 from uuid import UUID
 
-if TYPE_CHECKING:
-    from chess_app.application.session import Session
+from chess_app.domain.session import Session
 
 
 class SessionRepository(Protocol):
