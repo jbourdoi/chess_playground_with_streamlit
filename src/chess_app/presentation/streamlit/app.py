@@ -237,7 +237,7 @@ def main() -> None:
     st.set_page_config(
         page_title="Chess",
         page_icon="♟",
-        layout="centered",
+        layout="wide",
     )
 
     dependencies = build_dependencies(

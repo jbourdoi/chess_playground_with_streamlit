@@ -31,6 +31,7 @@ from .components import (
     render_move_history,
     render_players,
     render_promotion,
+    render_styles,
 )
 from .state import StreamlitUiState
 
@@ -41,50 +42,64 @@ class StreamlitView(View):
     """Render the chess application using Streamlit."""
 
     def render(self, state: ApplicationState) -> None:
-        """Render the complete application state."""
-        render_header()
+        """Render the complete application."""
+        render_styles()
 
-        render_messages(
-            message=state.message,
-            error=state.error,
+        left, right = st.columns(
+            [1, 1],
+            gap="large",
         )
 
-        if state.game is None:
-            st.info("Aucune partie en cours.")
-            return
+        with left:
+            render_header()
 
-        self._synchronize_ui_state(state.game)
+            render_messages(
+                message=state.message,
+                error=state.error,
+            )
 
-        render_players(state.game)
-        render_game_status(state.game)
+            if state.game is not None:
+                self._synchronize_ui_state(
+                    state.game,
+                )
 
-        ui_state = self._get_ui_state()
+                render_players(state.game)
+                render_game_status(state.game)
 
-        render_board(
-            game=state.game,
-            selected_square=ui_state.selected_square,
-            on_square_clicked=self._on_square_clicked,
-        )
+                ui_state = self._get_ui_state()
 
-        render_promotion(
-            game=state.game,
-            pending_promotion=ui_state.pending_promotion,
-            on_promotion_selected=(self._on_promotion_selected),
-        )
+                render_promotion(
+                    game=state.game,
+                    pending_promotion=(ui_state.pending_promotion),
+                    on_promotion_selected=(self._on_promotion_selected),
+                )
 
-        render_controls(
-            game=state.game,
-            on_suspend=self._queue_suspend,
-            on_resume=self._queue_resume,
-        )
+                render_controls(
+                    game=state.game,
+                    on_suspend=self._queue_suspend,
+                    on_resume=self._queue_resume,
+                )
 
-        render_move_history(state.game)
+                render_move_history(state.game)
+
+        with right:
+            if state.game is None:
+                st.info("No game in progress.")
+                return
+
+            ui_state = self._get_ui_state()
+
+            render_board(
+                game=state.game,
+                selected_square=ui_state.selected_square,
+                on_square_clicked=self._on_square_clicked,
+            )
 
     def read_command(
         self,
         state: ApplicationState,
     ) -> Command | None:
-        """Translate pending UI actions into application commands."""
+        """Translate pending UI actions into an application command."""
         if state.game is None:
             return None
 
@@ -109,6 +124,7 @@ class StreamlitView(View):
             return None
 
         uci = ui_state.pending_move_uci
+
         move = self._move_from_uci(uci)
 
         self._set_ui_state(
@@ -126,7 +142,7 @@ class StreamlitView(View):
         )
 
     def _get_ui_state(self) -> StreamlitUiState:
-        """Return the current transient Streamlit state."""
+        """Return the current transient UI state."""
         value = st.session_state.get(UI_STATE_KEY)
 
         if isinstance(value, StreamlitUiState):
@@ -142,7 +158,7 @@ class StreamlitView(View):
         self,
         ui_state: StreamlitUiState,
     ) -> None:
-        """Persist the transient Streamlit state."""
+        """Persist the transient UI state."""
         st.session_state[UI_STATE_KEY] = ui_state
 
     def _clear_pending_action(self) -> None:
@@ -161,7 +177,7 @@ class StreamlitView(View):
         square: str,
         legal_moves: tuple[str, ...],
     ) -> None:
-        """Handle a click on a chess-board square."""
+        """Handle a chess-board square click."""
         ui_state = self._get_ui_state()
 
         if ui_state.pending_promotion is not None:
@@ -250,7 +266,7 @@ class StreamlitView(View):
         target: str,
         promotion: str,
     ) -> None:
-        """Queue a promotion move selected by the user."""
+        """Queue a promotion move."""
         ui_state = self._get_ui_state()
 
         self._set_ui_state(
