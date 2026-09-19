@@ -5,7 +5,7 @@ import pytest
 from chess_app.domain.board import Board
 from chess_app.domain.move import Move
 from chess_app.domain.piece import Color, Piece, PieceType
-from chess_app.domain.position import Square
+from chess_app.domain.square import Square
 
 
 def test_empty_board_contains_no_piece() -> None:

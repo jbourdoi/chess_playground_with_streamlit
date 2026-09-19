@@ -3,17 +3,17 @@
 from uuid import uuid4
 
 from chess_app.domain.board import Board
-from chess_app.domain.castling import CastlingRights
+from chess_app.domain.castling_rights import CastlingRights
 from chess_app.domain.game import Game, GameStatus
 from chess_app.domain.move import Move
 from chess_app.domain.piece import Color, Piece, PieceType
 from chess_app.domain.player import Player
-from chess_app.domain.position import Square
 from chess_app.domain.rules import (
     is_in_check,
     is_legal_move,
     is_stalemate,
 )
+from chess_app.domain.square import Square
 
 
 def move(source: str, target: str) -> Move:

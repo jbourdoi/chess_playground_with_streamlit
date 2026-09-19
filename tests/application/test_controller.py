@@ -18,8 +18,8 @@ from chess_app.application.queries import GetGameState
 from chess_app.domain.move import Move
 from chess_app.domain.piece import Color
 from chess_app.domain.player import PlayerType
-from chess_app.domain.position import Square
-from chess_app.infrastructure.persistence.in_memory_repository import (
+from chess_app.domain.square import Square
+from chess_app.infrastructure.persistence.in_memory_game_repository import (
     InMemoryGameRepository,
 )
 
@@ -435,3 +435,33 @@ def test_user_cannot_play_when_it_is_not_their_turn() -> None:
     )
 
     assert state.error == "it is not the user's turn"
+
+
+def test_user_cannot_suspend_another_users_game() -> None:
+    repository = InMemoryGameRepository()
+
+    owner_id = uuid4()
+    other_id = uuid4()
+
+    owner_context = make_context(owner_id)
+    other_context = make_context(other_id)
+
+    game_id = UUID("11111111-1111-1111-1111-111111111111")
+
+    controller = Controller(
+        game_repository=repository,
+        game_id_factory=lambda: game_id,
+    )
+
+    controller.handle(
+        owner_context,
+        make_new_game_command(owner_id),
+    )
+
+    state = controller.handle(
+        other_context,
+        SuspendGame(game_id=game_id),
+    )
+
+    assert state.game is None
+    assert state.error == ("user does not participate in this game")

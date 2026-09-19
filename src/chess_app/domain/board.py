@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 from .move import Move
 from .piece import Color, Piece, PieceType
-from .position import Square
+from .square import Square
 
 
 @dataclass(frozen=True, slots=True)

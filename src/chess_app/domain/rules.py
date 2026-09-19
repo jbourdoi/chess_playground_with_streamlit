@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 from .board import Board
-from .castling import CastlingRights
+from .castling_rights import CastlingRights
 from .move import Move
 from .piece import Color, Piece, PieceType
-from .position import Square
+from .square import Square
 
 
 def is_square_attacked(

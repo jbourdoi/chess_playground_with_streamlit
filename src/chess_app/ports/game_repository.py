@@ -1,4 +1,4 @@
-# src/chess_app/ports/repository.py
+# src/chess_app/ports/game_repository.py
 
 from __future__ import annotations
 

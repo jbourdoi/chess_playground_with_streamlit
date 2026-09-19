@@ -11,4 +11,4 @@ htmlcov/
 data/*.db
 data/*.sqlite
 tests.py
-source.py
+sources.py

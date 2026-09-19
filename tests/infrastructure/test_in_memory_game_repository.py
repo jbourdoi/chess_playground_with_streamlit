@@ -1,14 +1,14 @@
-# tests/infrastructure/test_in_memory_repository.py
+# tests/infrastructure/test_in_memory_game_repository.py
 
 from uuid import UUID, uuid4
 
 from chess_app.domain.game import Game
 from chess_app.domain.piece import Color
 from chess_app.domain.player import Player
-from chess_app.infrastructure.persistence.in_memory_repository import (
+from chess_app.infrastructure.persistence.in_memory_game_repository import (
     InMemoryGameRepository,
 )
-from chess_app.ports.repository import GameRepository
+from chess_app.ports.game_repository import GameRepository
 
 
 def make_game(game_id: UUID | None = None) -> Game:

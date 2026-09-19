@@ -1,13 +1,13 @@
-# tests/infrastructure/test_in_memory_session.py
+# tests/infrastructure/test_in_memory_session_repository.py
 
 from datetime import timedelta
 from uuid import uuid4
 
 from chess_app.domain.session import Session
-from chess_app.infrastructure.session.in_memory_session import (
+from chess_app.infrastructure.session.in_memory_session_repository import (
     InMemorySessionRepository,
 )
-from chess_app.ports.session import SessionRepository
+from chess_app.ports.session_repository import SessionRepository
 
 
 def make_session() -> Session:

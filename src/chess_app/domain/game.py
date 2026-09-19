@@ -7,12 +7,11 @@ from enum import Enum
 from uuid import UUID
 
 from .board import Board
-from .castling import CastlingRights
+from .castling_rights import CastlingRights
 from .errors import IllegalMoveError, InvalidGameStateError
 from .move import Move
 from .piece import Color
 from .player import Player
-from .position import Square
 from .rules import (
     is_checkmate,
     is_in_check,
@@ -22,6 +21,7 @@ from .rules import (
     next_castling_rights,
     next_en_passant_target,
 )
+from .square import Square
 
 
 class GameStatus(Enum):

@@ -25,7 +25,7 @@ from chess_app.application.state import (
 from chess_app.domain.errors import ChessDomainError
 from chess_app.domain.game import Game
 from chess_app.domain.player import Player, PlayerType
-from chess_app.ports.repository import GameRepository
+from chess_app.ports.game_repository import GameRepository
 
 
 class Controller:
@@ -113,21 +113,16 @@ class Controller:
         query: GetGameState,
     ) -> ApplicationState:
         """Retrieve the current state of a game."""
-        game = self._get_game(query.game_id)
-
-        if game is None:
-            return ApplicationState(error=f"game not found: {query.game_id}")
-
-        access_error = self._validate_game_access(
+        result = self._load_authorized_game(
             context,
-            game,
+            query.game_id,
         )
 
-        if access_error is not None:
-            return ApplicationState(error=access_error)
+        if isinstance(result, ApplicationState):
+            return result
 
         return ApplicationState(
-            game=game_to_state(game),
+            game=game_to_state(result),
         )
 
     def _handle_new_game(
@@ -171,18 +166,15 @@ class Controller:
         command: PlayMove,
     ) -> ApplicationState:
         """Play a move in an existing game."""
-        game = self._get_game(command.game_id)
-
-        if game is None:
-            return ApplicationState(error=f"game not found: {command.game_id}")
-
-        access_error = self._validate_game_access(
+        result = self._load_authorized_game(
             context,
-            game,
+            command.game_id,
         )
 
-        if access_error is not None:
-            return ApplicationState(error=access_error)
+        if isinstance(result, ApplicationState):
+            return result
+
+        game = result
 
         if not game.is_current_player(context.user.user_id):
             return ApplicationState(
@@ -190,20 +182,10 @@ class Controller:
                 error="it is not the user's turn",
             )
 
-        try:
-            updated_game = game.play(command.move)
-
-        except ChessDomainError as exc:
-            return ApplicationState(
-                game=game_to_state(game),
-                error=str(exc),
-            )
-
-        self._game_repository.save(updated_game)
-
-        return ApplicationState(
-            game=game_to_state(updated_game),
-            message=f"Move played: {command.move.uci}",
+        return self._apply_game_update(
+            game,
+            lambda current_game: current_game.play(command.move),
+            f"Move played: {command.move.uci}",
         )
 
     def _handle_suspend_game(
@@ -212,32 +194,18 @@ class Controller:
         command: SuspendGame,
     ) -> ApplicationState:
         """Suspend an existing game."""
-        game = self._get_game(command.game_id)
-
-        if game is None:
-            return ApplicationState(error=f"game not found: {command.game_id}")
-
-        access_error = self._validate_game_access(
+        result = self._load_authorized_game(
             context,
-            game,
+            command.game_id,
         )
 
-        if access_error is not None:
-            return ApplicationState(error=access_error)
-        try:
-            suspended_game = game.suspend()
+        if isinstance(result, ApplicationState):
+            return result
 
-        except ChessDomainError as exc:
-            return ApplicationState(
-                game=game_to_state(game),
-                error=str(exc),
-            )
-
-        self._game_repository.save(suspended_game)
-
-        return ApplicationState(
-            game=game_to_state(suspended_game),
-            message="Game suspended.",
+        return self._apply_game_update(
+            result,
+            lambda game: game.suspend(),
+            "Game suspended.",
         )
 
     def _handle_resume_game(
@@ -246,37 +214,42 @@ class Controller:
         command: ResumeGame,
     ) -> ApplicationState:
         """Resume an existing game."""
-        game = self._get_game(command.game_id)
+        result = self._load_authorized_game(
+            context,
+            command.game_id,
+        )
+
+        if isinstance(result, ApplicationState):
+            return result
+
+        return self._apply_game_update(
+            result,
+            lambda game: game.resume(),
+            "Game resumed.",
+        )
+
+    def _load_authorized_game(
+        self,
+        context: ApplicationContext,
+        game_id: UUID,
+    ) -> Game | ApplicationState:
+        """
+        Retrieve a game and validate user access.
+
+        Return an ApplicationState containing an error when the game
+        cannot be accessed.
+        """
+        game = self._game_repository.get(game_id)
 
         if game is None:
-            return ApplicationState(error=f"game not found: {command.game_id}")
+            return ApplicationState(error=f"game not found: {game_id}")
 
-        access_error = self._validate_game_access(
-            context,
-            game,
-        )
-
-        if access_error is not None:
-            return ApplicationState(error=access_error)
-        try:
-            resumed_game = game.resume()
-
-        except ChessDomainError as exc:
+        if not game.has_player(context.user.user_id):
             return ApplicationState(
-                game=game_to_state(game),
-                error=str(exc),
+                error="user does not participate in this game"
             )
 
-        self._game_repository.save(resumed_game)
-
-        return ApplicationState(
-            game=game_to_state(resumed_game),
-            message="Game resumed.",
-        )
-
-    def _get_game(self, game_id: UUID) -> Game | None:
-        """Retrieve a game from the repository."""
-        return self._game_repository.get(game_id)
+        return game
 
     @staticmethod
     def _build_player(spec: PlayerSpec) -> Player:
@@ -289,17 +262,29 @@ class Controller:
             user_id=spec.user_id,
         )
 
-    def _validate_game_access(
+    def _apply_game_update(
         self,
-        context: ApplicationContext,
         game: Game,
-    ) -> str | None:
+        update: Callable[[Game], Game],
+        message: str,
+    ) -> ApplicationState:
         """
-        Validate that the current user participates in the game.
+        Apply a pure game update and persist the resulting game.
 
-        Return an error message when access is denied.
+        The update callable must return a new Game.
         """
-        if not game.has_player(context.user.user_id):
-            return "user does not participate in this game"
+        try:
+            updated_game = update(game)
 
-        return None
+        except ChessDomainError as exc:
+            return ApplicationState(
+                game=game_to_state(game),
+                error=str(exc),
+            )
+
+        self._game_repository.save(updated_game)
+
+        return ApplicationState(
+            game=game_to_state(updated_game),
+            message=message,
+        )

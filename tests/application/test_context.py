@@ -1,4 +1,4 @@
-# tests/application/test_contexte.py
+# tests/application/test_context.py
 
 from uuid import uuid4
 

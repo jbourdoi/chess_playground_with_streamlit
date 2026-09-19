@@ -1,4 +1,4 @@
-# tests/application/test_view.py
+# tests/ports/test_view.py
 
 from uuid import uuid4
 
@@ -7,7 +7,7 @@ from chess_app.application.commands import (
 )
 from chess_app.application.state import ApplicationState
 from chess_app.domain.move import Move
-from chess_app.domain.position import Square
+from chess_app.domain.square import Square
 from chess_app.ports.view import View
 
 

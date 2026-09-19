@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from .piece import PieceType
-from .position import Square
+from .square import Square
 
 
 @dataclass(frozen=True, slots=True)

@@ -14,7 +14,7 @@ from chess_app.application.commands import (
 from chess_app.domain.move import Move
 from chess_app.domain.piece import Color
 from chess_app.domain.player import PlayerType
-from chess_app.domain.position import Square
+from chess_app.domain.square import Square
 
 
 def make_player(

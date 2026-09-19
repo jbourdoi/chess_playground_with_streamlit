@@ -1,4 +1,4 @@
-# src/chess_app/ports/session.py
+# src/chess_app/ports/session_repository.py
 
 from __future__ import annotations
 

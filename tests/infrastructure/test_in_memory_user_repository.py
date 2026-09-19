@@ -9,7 +9,7 @@ from chess_app.domain.user import User
 from chess_app.infrastructure.persistence.in_memory_user_repository import (
     InMemoryUserRepository,
 )
-from chess_app.ports.user import UserRepository
+from chess_app.ports.user_repository import UserRepository
 
 
 def make_user(

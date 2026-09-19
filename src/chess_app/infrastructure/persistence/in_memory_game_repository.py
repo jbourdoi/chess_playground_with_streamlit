@@ -1,4 +1,4 @@
-# src/chess_app/infrastructure/persistence/in_memory_repository.py
+# src/chess_app/infrastructure/persistence/in_memory_game_repository.py
 
 from __future__ import annotations
 

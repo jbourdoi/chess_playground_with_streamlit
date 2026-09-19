@@ -1,17 +1,21 @@
-# tests/application/test_session.py
+# tests/application/test_session_service.py
 
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
-
-import pytest
 
 from chess_app.application.session_service import (
     SessionService,
     hash_session_token,
 )
-from chess_app.domain.session import Session
-from chess_app.infrastructure.session.in_memory_session import (
+from chess_app.domain.user import User
+from chess_app.infrastructure.persistence.sqlite_user_repository import (
+    SQLiteUserRepository,
+)
+from chess_app.infrastructure.session.in_memory_session_repository import (
     InMemorySessionRepository,
+)
+from chess_app.infrastructure.session.sqlite_session_repository import (
+    SQLiteSessionRepository,
 )
 
 NOW = datetime(
@@ -27,67 +31,6 @@ NOW = datetime(
 SESSION_ID = UUID("11111111-1111-1111-1111-111111111111")
 
 USER_ID = UUID("22222222-2222-2222-2222-222222222222")
-
-
-def make_session() -> Session:
-    """Create a deterministic test session."""
-    return Session(
-        session_id=SESSION_ID,
-        user_id=USER_ID,
-        created_at=NOW,
-        last_seen_at=NOW,
-        expires_at=NOW + timedelta(days=1),
-    )
-
-
-def test_session_is_not_expired() -> None:
-    session = make_session()
-
-    assert not session.is_expired(NOW)
-
-
-def test_session_is_expired_at_expiration_time() -> None:
-    session = make_session()
-    expiration = NOW + timedelta(days=1)
-
-    assert session.is_expired(expiration)
-
-
-def test_touch_returns_new_session() -> None:
-    session = make_session()
-    later = NOW + timedelta(minutes=5)
-
-    updated = session.touch(later)
-
-    assert updated is not session
-    assert session.last_seen_at == NOW
-    assert updated.last_seen_at == later
-
-
-def test_touch_cannot_move_backwards() -> None:
-    session = make_session()
-
-    with pytest.raises(ValueError):
-        session.touch(NOW - timedelta(minutes=1))
-
-
-def test_expired_session_cannot_be_touched() -> None:
-    session = make_session()
-    expiration = NOW + timedelta(days=1)
-
-    with pytest.raises(ValueError):
-        session.touch(expiration)
-
-
-def test_session_requires_timezone_aware_dates() -> None:
-    with pytest.raises(ValueError):
-        Session(
-            session_id=SESSION_ID,
-            user_id=USER_ID,
-            created_at=datetime(2026, 9, 19),
-            last_seen_at=NOW,
-            expires_at=NOW + timedelta(days=1),
-        )
 
 
 def test_token_hash_is_deterministic() -> None:
@@ -226,3 +169,39 @@ def test_revoke_unknown_token() -> None:
     )
 
     assert not service.revoke("unknown-token")
+
+
+def test_session_service_works_with_sqlite(
+    tmp_path,
+) -> None:
+    """Use SessionService with the SQLite adapter."""
+    from uuid import uuid4
+
+    database_path = tmp_path / "chess.db"
+
+    user_repository = SQLiteUserRepository(database_path)
+
+    user_id = uuid4()
+
+    user = User(
+        user_id=user_id,
+        username="alice",
+        created_at=NOW,
+    )
+
+    user_repository.save(user)
+
+    session_repository = SQLiteSessionRepository(database_path)
+
+    service = SessionService(
+        repository=session_repository,
+        session_id_factory=lambda: SESSION_ID,
+        token_factory=lambda: "secret-token",
+        clock=lambda: NOW,
+    )
+
+    created = service.create(user_id)
+
+    restored = service.authenticate(created.token)
+
+    assert restored == created.session

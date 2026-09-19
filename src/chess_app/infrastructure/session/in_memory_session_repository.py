@@ -1,4 +1,4 @@
-# src/chess_app/infrastructure/session/in_memory_session.py
+# src/chess_app/infrastructure/session/in_memory_session_repository.py
 
 from __future__ import annotations
 

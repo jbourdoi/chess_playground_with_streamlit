@@ -5,11 +5,11 @@ import pytest
 from chess_app.domain.board import Board
 from chess_app.domain.move import Move
 from chess_app.domain.piece import Color, Piece, PieceType
-from chess_app.domain.position import Square
 from chess_app.domain.rules import (
     is_pseudo_legal_move,
     pseudo_legal_moves,
 )
+from chess_app.domain.square import Square
 
 
 def move(source: str, target: str) -> Move:

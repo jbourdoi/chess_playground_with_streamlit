@@ -1,4 +1,4 @@
-# src/chess_app/domain/castling.py
+# src/chess_app/domain/castling_rights.py
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-# src/chess_app/domain/position.py
+# src/chess_app/domain/square.py
 
 from __future__ import annotations
 

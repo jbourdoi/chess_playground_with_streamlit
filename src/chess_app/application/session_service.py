@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 from uuid import UUID, uuid4
 
 from chess_app.domain.session import Session
-from chess_app.ports.session import SessionRepository
+from chess_app.ports.session_repository import SessionRepository
 
 DEFAULT_SESSION_TTL = timedelta(days=30)
 SESSION_TOKEN_BYTES = 32

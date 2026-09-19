@@ -1,8 +1,8 @@
-# tests/domain/test_position.py
+# tests/domain/test_square.py
 
 import pytest
 
-from chess_app.domain.position import Square
+from chess_app.domain.square import Square
 
 
 @pytest.mark.parametrize(

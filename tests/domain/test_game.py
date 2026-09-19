@@ -9,7 +9,7 @@ from chess_app.domain.game import Game, GameStatus
 from chess_app.domain.move import Move
 from chess_app.domain.piece import Color, Piece, PieceType
 from chess_app.domain.player import Player, PlayerType
-from chess_app.domain.position import Square
+from chess_app.domain.square import Square
 
 
 def make_players() -> tuple[Player, Player]:

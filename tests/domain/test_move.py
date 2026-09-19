@@ -4,7 +4,7 @@ import pytest
 
 from chess_app.domain.move import Move
 from chess_app.domain.piece import PieceType
-from chess_app.domain.position import Square
+from chess_app.domain.square import Square
 
 
 def test_move_rejects_same_source_and_target() -> None:

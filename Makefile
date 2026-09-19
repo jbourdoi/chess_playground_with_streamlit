@@ -29,7 +29,15 @@ format:
 typecheck:
 	$(PYTHON_BIN) -m mypy --strict $(SRC)
 
-pipeline: format lint typecheck test
+snapshot:
+	cat src/*/*.py src/*/*/*.py > sources.py
+	cat tests/*/*.py > tests.py
+	wc -l sources.py tests.py
+
+headers:
+	bash scripts/check_python_headers.sh
+
+pipeline: headers format lint typecheck test snapshot run
 
 run:
 	$(PYTHON_BIN) -m streamlit run $(APP)
