@@ -1,3 +1,5 @@
+# src/chess_app/ports/session.py
+
 from __future__ import annotations
 
 from typing import Protocol

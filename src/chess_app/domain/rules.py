@@ -1,3 +1,5 @@
+# src/chess_app/domain/rules.py
+
 from __future__ import annotations
 
 from .board import Board

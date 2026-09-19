@@ -1,3 +1,5 @@
+# tests/domain/test_board.py
+
 import pytest
 
 from chess_app.domain.board import Board

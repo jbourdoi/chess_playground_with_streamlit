@@ -1,3 +1,5 @@
+# tests/domain/test_piece.py
+
 from chess_app.domain.piece import Color, Piece, PieceType
 
 

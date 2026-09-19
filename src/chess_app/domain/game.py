@@ -1,3 +1,5 @@
+# src/chess_app/domain/game.py
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
@@ -195,3 +197,21 @@ class Game:
             self,
             status=GameStatus.IN_PROGRESS,
         )
+
+    def has_player(self, user_id: UUID) -> bool:
+        """
+        Return whether a user participates in the game.
+
+        AI players are ignored because they are not associated with
+        a user account.
+        """
+        return (
+            self.white_player.user_id == user_id
+            or self.black_player.user_id == user_id
+        )
+
+    def is_current_player(self, user_id: UUID) -> bool:
+        """
+        Return whether a user controls the player whose turn it is.
+        """
+        return self.current_player.user_id == user_id

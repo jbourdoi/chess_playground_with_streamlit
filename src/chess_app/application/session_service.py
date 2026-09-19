@@ -1,3 +1,5 @@
+# src/chess_app/application/session_service.py
+
 from __future__ import annotations
 
 import hashlib

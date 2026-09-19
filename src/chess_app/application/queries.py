@@ -1,3 +1,5 @@
+# src/chess_app/application/queries.py
+
 from __future__ import annotations
 
 from dataclasses import dataclass

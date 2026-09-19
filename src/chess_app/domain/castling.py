@@ -1,3 +1,5 @@
+# src/chess_app/domain/castling.py
+
 from __future__ import annotations
 
 from dataclasses import dataclass, replace

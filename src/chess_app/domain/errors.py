@@ -1,3 +1,6 @@
+# src/chess_app/domain/errors.py
+
+
 class ChessDomainError(Exception):
     """Base exception for domain errors."""
 

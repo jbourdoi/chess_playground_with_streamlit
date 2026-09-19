@@ -1,3 +1,5 @@
+# tests/application/test_queries.py
+
 from uuid import uuid4
 
 from chess_app.application.queries import GetGameState

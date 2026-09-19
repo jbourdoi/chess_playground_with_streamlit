@@ -1,3 +1,5 @@
+# src/chess_app/application/commands.py
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -16,11 +18,15 @@ class PlayerSpec:
     name: str
     color: Color
     player_type: PlayerType = PlayerType.HUMAN
+    user_id: UUID | None = None
 
     def __post_init__(self) -> None:
         """Validate the player specification."""
         if not self.name.strip():
             raise ValueError("player name cannot be empty")
+
+        if self.player_type is PlayerType.AI and self.user_id is not None:
+            raise ValueError("an AI player cannot be associated with a user")
 
 
 @dataclass(frozen=True, slots=True)

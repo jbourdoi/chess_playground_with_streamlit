@@ -1,3 +1,5 @@
+# src/chess_app/ports/view.py
+
 from __future__ import annotations
 
 from typing import Protocol
@@ -9,7 +11,10 @@ from chess_app.application.state import ApplicationState
 class View(Protocol):
     """Define the presentation interface of the application."""
 
-    def render(self, state: ApplicationState) -> None:
+    def render(
+        self,
+        state: ApplicationState,
+    ) -> None:
         """
         Render the current application state.
 

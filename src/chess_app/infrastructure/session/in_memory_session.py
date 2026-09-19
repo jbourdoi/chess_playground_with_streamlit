@@ -1,3 +1,5 @@
+# src/chess_app/infrastructure/session/in_memory_session.py
+
 from __future__ import annotations
 
 from uuid import UUID

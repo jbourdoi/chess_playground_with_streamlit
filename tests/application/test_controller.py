@@ -1,3 +1,5 @@
+# tests/application/test_controller.py
+
 from uuid import UUID, uuid4
 
 from chess_app.application.commands import (
@@ -6,6 +8,10 @@ from chess_app.application.commands import (
     PlayMove,
     ResumeGame,
     SuspendGame,
+)
+from chess_app.application.context import (
+    ApplicationContext,
+    UserContext,
 )
 from chess_app.application.controller import Controller
 from chess_app.application.queries import GetGameState
@@ -17,26 +23,30 @@ from chess_app.infrastructure.persistence.in_memory_repository import (
     InMemoryGameRepository,
 )
 
-# class FakeGameRepository:
-#     """In-memory repository used by application tests."""
 
-#     def __init__(self) -> None:
-#         self.games: dict[UUID, Game] = {}
+def make_context(
+    user_id: UUID | None = None,
+) -> ApplicationContext:
+    """Create a test application context."""
+    current_user_id = user_id if user_id is not None else uuid4()
 
-#     def get(self, game_id: UUID) -> Game | None:
-#         """Retrieve a game."""
-#         return self.games.get(game_id)
+    return ApplicationContext(
+        user=UserContext(
+            user_id=current_user_id,
+            username="Alice",
+        ),
+        session_id=uuid4(),
+    )
 
-#     def save(self, game: Game) -> None:
-#         """Store a game."""
-#         self.games[game.game_id] = game
 
-
-def make_new_game_command() -> NewGame:
+def make_new_game_command(
+    user_id: UUID,
+) -> NewGame:
     """Create a new game command."""
     return NewGame(
         white_player=PlayerSpec(
             player_id=uuid4(),
+            user_id=user_id,
             name="Alice",
             color=Color.WHITE,
         ),
@@ -59,15 +69,19 @@ def make_move(source: str, target: str) -> Move:
 
 def test_new_game_creates_and_saves_game() -> None:
     repository = InMemoryGameRepository()
-
     game_id = UUID("11111111-1111-1111-1111-111111111111")
+    user_id = UUID("22222222-2222-2222-2222-222222222222")
+    context = make_context(user_id)
 
     controller = Controller(
         game_repository=repository,
         game_id_factory=lambda: game_id,
     )
 
-    state = controller.handle(make_new_game_command())
+    state = controller.handle(
+        context,
+        make_new_game_command(user_id),
+    )
 
     assert state.error is None
     assert state.game is not None
@@ -82,21 +96,26 @@ def test_new_game_creates_and_saves_game() -> None:
 def test_play_move_updates_game() -> None:
     repository = InMemoryGameRepository()
     game_id = UUID("11111111-1111-1111-1111-111111111111")
+    context = make_context()
 
     controller = Controller(
         game_repository=repository,
         game_id_factory=lambda: game_id,
     )
 
-    state = controller.handle(make_new_game_command())
+    state = controller.handle(
+        context,
+        make_new_game_command(context.user.user_id),
+    )
 
     assert state.game is not None
 
     state = controller.handle(
+        context,
         PlayMove(
             game_id=game_id,
             move=make_move("e2", "e4"),
-        )
+        ),
     )
 
     assert state.error is None
@@ -110,19 +129,24 @@ def test_play_move_updates_game() -> None:
 def test_illegal_move_preserves_previous_state() -> None:
     repository = InMemoryGameRepository()
     game_id = UUID("11111111-1111-1111-1111-111111111111")
+    context = make_context()
 
     controller = Controller(
         game_repository=repository,
         game_id_factory=lambda: game_id,
     )
 
-    controller.handle(make_new_game_command())
+    controller.handle(
+        context,
+        make_new_game_command(context.user.user_id),
+    )
 
     state = controller.handle(
+        context,
         PlayMove(
             game_id=game_id,
             move=make_move("e2", "e5"),
-        )
+        ),
     )
 
     assert state.error is not None
@@ -134,15 +158,22 @@ def test_illegal_move_preserves_previous_state() -> None:
 def test_suspend_game() -> None:
     repository = InMemoryGameRepository()
     game_id = UUID("11111111-1111-1111-1111-111111111111")
+    context = make_context()
 
     controller = Controller(
         game_repository=repository,
         game_id_factory=lambda: game_id,
     )
 
-    controller.handle(make_new_game_command())
+    controller.handle(
+        context,
+        make_new_game_command(context.user.user_id),
+    )
 
-    state = controller.handle(SuspendGame(game_id=game_id))
+    state = controller.handle(
+        context,
+        SuspendGame(game_id=game_id),
+    )
 
     assert state.error is None
     assert state.game is not None
@@ -152,16 +183,27 @@ def test_suspend_game() -> None:
 def test_resume_game() -> None:
     repository = InMemoryGameRepository()
     game_id = UUID("11111111-1111-1111-1111-111111111111")
+    context = make_context()
 
     controller = Controller(
         game_repository=repository,
         game_id_factory=lambda: game_id,
     )
 
-    controller.handle(make_new_game_command())
-    controller.handle(SuspendGame(game_id=game_id))
+    controller.handle(
+        context,
+        make_new_game_command(context.user.user_id),
+    )
 
-    state = controller.handle(ResumeGame(game_id=game_id))
+    controller.handle(
+        context,
+        SuspendGame(game_id=game_id),
+    )
+
+    state = controller.handle(
+        context,
+        ResumeGame(game_id=game_id),
+    )
 
     assert state.error is None
     assert state.game is not None
@@ -170,9 +212,13 @@ def test_resume_game() -> None:
 
 def test_command_for_missing_game_returns_error() -> None:
     repository = InMemoryGameRepository()
+    context = make_context()
     controller = Controller(repository)
 
-    state = controller.handle(SuspendGame(game_id=uuid4()))
+    state = controller.handle(
+        context,
+        SuspendGame(game_id=uuid4()),
+    )
 
     assert state.game is None
     assert state.error is not None
@@ -181,15 +227,22 @@ def test_command_for_missing_game_returns_error() -> None:
 def test_get_game_state_returns_current_game() -> None:
     repository = InMemoryGameRepository()
     game_id = UUID("11111111-1111-1111-1111-111111111111")
+    context = make_context()
 
     controller = Controller(
         game_repository=repository,
         game_id_factory=lambda: game_id,
     )
 
-    controller.handle(make_new_game_command())
+    controller.handle(
+        context,
+        make_new_game_command(context.user.user_id),
+    )
 
-    state = controller.handle_query(GetGameState(game_id=game_id))
+    state = controller.handle_query(
+        context,
+        GetGameState(game_id=game_id),
+    )
 
     assert state.error is None
     assert state.game is not None
@@ -201,22 +254,30 @@ def test_get_game_state_returns_current_game() -> None:
 def test_get_game_state_returns_updated_game() -> None:
     repository = InMemoryGameRepository()
     game_id = UUID("11111111-1111-1111-1111-111111111111")
+    context = make_context()
 
     controller = Controller(
         game_repository=repository,
         game_id_factory=lambda: game_id,
     )
 
-    controller.handle(make_new_game_command())
+    controller.handle(
+        context,
+        make_new_game_command(context.user.user_id),
+    )
 
     controller.handle(
+        context,
         PlayMove(
             game_id=game_id,
             move=make_move("e2", "e4"),
-        )
+        ),
     )
 
-    state = controller.handle_query(GetGameState(game_id=game_id))
+    state = controller.handle_query(
+        context,
+        GetGameState(game_id=game_id),
+    )
 
     assert state.error is None
     assert state.game is not None
@@ -228,11 +289,149 @@ def test_get_game_state_returns_updated_game() -> None:
 
 def test_get_game_state_for_missing_game_returns_error() -> None:
     repository = InMemoryGameRepository()
+    context = make_context()
     controller = Controller(repository)
-
     game_id = uuid4()
 
-    state = controller.handle_query(GetGameState(game_id=game_id))
+    state = controller.handle_query(
+        context,
+        GetGameState(game_id=game_id),
+    )
 
     assert state.game is None
     assert state.error is not None
+
+
+def test_new_game_rejects_another_human_user() -> None:
+    repository = InMemoryGameRepository()
+    authenticated_user = uuid4()
+    other_user = uuid4()
+
+    context = make_context(authenticated_user)
+
+    controller = Controller(
+        game_repository=repository,
+    )
+
+    command = NewGame(
+        white_player=PlayerSpec(
+            player_id=other_user,
+            name="Bob",
+            color=Color.WHITE,
+        ),
+        black_player=PlayerSpec(
+            player_id=uuid4(),
+            name="ChessBot",
+            color=Color.BLACK,
+            player_type=PlayerType.AI,
+        ),
+    )
+
+    state = controller.handle(
+        context,
+        command,
+    )
+
+    assert state.game is None
+    assert state.error is not None
+    assert state.error == "human player does not match authenticated user"
+
+
+def test_user_cannot_play_another_users_game() -> None:
+    repository = InMemoryGameRepository()
+
+    owner_id = uuid4()
+    attacker_id = uuid4()
+
+    owner_context = make_context(owner_id)
+    attacker_context = make_context(attacker_id)
+
+    game_id = UUID("11111111-1111-1111-1111-111111111111")
+
+    controller = Controller(
+        game_repository=repository,
+        game_id_factory=lambda: game_id,
+    )
+
+    controller.handle(
+        owner_context,
+        make_new_game_command(owner_id),
+    )
+
+    state = controller.handle(
+        attacker_context,
+        PlayMove(
+            game_id=game_id,
+            move=make_move("e2", "e4"),
+        ),
+    )
+
+    assert state.error == ("user does not participate in this game")
+
+
+def test_user_cannot_read_another_users_game() -> None:
+    repository = InMemoryGameRepository()
+
+    owner_id = uuid4()
+    attacker_id = uuid4()
+
+    owner_context = make_context(owner_id)
+    attacker_context = make_context(attacker_id)
+
+    game_id = UUID("11111111-1111-1111-1111-111111111111")
+
+    controller = Controller(
+        game_repository=repository,
+        game_id_factory=lambda: game_id,
+    )
+
+    controller.handle(
+        owner_context,
+        make_new_game_command(owner_id),
+    )
+
+    state = controller.handle_query(
+        attacker_context,
+        GetGameState(game_id=game_id),
+    )
+
+    assert state.game is None
+    assert state.error == ("user does not participate in this game")
+
+
+def test_user_cannot_play_when_it_is_not_their_turn() -> None:
+    repository = InMemoryGameRepository()
+
+    user_id = uuid4()
+
+    context = make_context(user_id)
+
+    game_id = UUID("11111111-1111-1111-1111-111111111111")
+
+    controller = Controller(
+        game_repository=repository,
+        game_id_factory=lambda: game_id,
+    )
+
+    controller.handle(
+        context,
+        make_new_game_command(user_id),
+    )
+
+    controller.handle(
+        context,
+        PlayMove(
+            game_id=game_id,
+            move=make_move("e2", "e4"),
+        ),
+    )
+
+    state = controller.handle(
+        context,
+        PlayMove(
+            game_id=game_id,
+            move=make_move("e4", "e5"),
+        ),
+    )
+
+    assert state.error == "it is not the user's turn"

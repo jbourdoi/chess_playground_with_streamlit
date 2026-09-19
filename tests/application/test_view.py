@@ -1,3 +1,5 @@
+# tests/application/test_view.py
+
 from uuid import uuid4
 
 from chess_app.application.commands import (
