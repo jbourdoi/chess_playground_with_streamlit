@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import streamlit as st
 
 from chess_app.application.commands import (
     Command,
+    NewGame,
+    PlayerSpec,
     PlayMove,
     ResumeGame,
     SuspendGame,
@@ -17,7 +19,8 @@ from chess_app.application.state import (
     GameState,
 )
 from chess_app.domain.move import Move
-from chess_app.domain.piece import PieceType
+from chess_app.domain.piece import Color, PieceType
+from chess_app.domain.player import PlayerType
 from chess_app.domain.square import Square
 from chess_app.ports.view import View
 
@@ -77,6 +80,8 @@ class StreamlitView(View):
                     game=state.game,
                     on_suspend=self._queue_suspend,
                     on_resume=self._queue_resume,
+                    on_new_game_local=self._queue_new_game_local,
+                    on_new_game_ai=self._queue_new_game_ai,
                 )
 
                 render_move_history(state.game)
@@ -99,31 +104,72 @@ class StreamlitView(View):
         state: ApplicationState,
     ) -> Command | None:
         """Translate pending UI actions into an application command."""
+        ui_state = self._get_ui_state()
+
+        if ui_state.pending_action == "new_game_local":
+            self._clear_pending_action()
+            user_id = (
+                UUID(state.game.white_player.player_id)
+                if state.game
+                else uuid4()
+            )
+            return NewGame(
+                white_player=PlayerSpec(
+                    player_id=user_id,
+                    name="Player 1 (White)",
+                    color=Color.WHITE,
+                    player_type=PlayerType.HUMAN,
+                    user_id=user_id,
+                ),
+                black_player=PlayerSpec(
+                    player_id=uuid4(),
+                    name="Player 2 (Black)",
+                    color=Color.BLACK,
+                    player_type=PlayerType.HUMAN,
+                    user_id=user_id,
+                ),
+            )
+
+        if ui_state.pending_action == "new_game_ai":
+            self._clear_pending_action()
+            user_id = (
+                UUID(state.game.white_player.player_id)
+                if state.game
+                else uuid4()
+            )
+            return NewGame(
+                white_player=PlayerSpec(
+                    player_id=user_id,
+                    name="Player 1",
+                    color=Color.WHITE,
+                    player_type=PlayerType.HUMAN,
+                    user_id=user_id,
+                ),
+                black_player=PlayerSpec(
+                    player_id=uuid4(),
+                    name="ChessBot",
+                    color=Color.BLACK,
+                    player_type=PlayerType.AI,
+                ),
+            )
+
         if state.game is None:
             return None
 
-        ui_state = self._get_ui_state()
         game_id = UUID(state.game.game_id)
 
         if ui_state.pending_action == "suspend":
             self._clear_pending_action()
-
-            return SuspendGame(
-                game_id=game_id,
-            )
+            return SuspendGame(game_id=game_id)
 
         if ui_state.pending_action == "resume":
             self._clear_pending_action()
-
-            return ResumeGame(
-                game_id=game_id,
-            )
+            return ResumeGame(game_id=game_id)
 
         if ui_state.pending_move_uci is None:
             return None
 
         uci = ui_state.pending_move_uci
-
         move = self._move_from_uci(uci)
 
         self._set_ui_state(
@@ -139,6 +185,16 @@ class StreamlitView(View):
             game_id=game_id,
             move=move,
         )
+
+    def _queue_new_game_local(self) -> None:
+        """Queue a new local 2-player game command."""
+        ui_state = self._get_ui_state()
+        self._set_ui_state(replace(ui_state, pending_action="new_game_local"))
+
+    def _queue_new_game_ai(self) -> None:
+        """Queue a new game vs AI command."""
+        ui_state = self._get_ui_state()
+        self._set_ui_state(replace(ui_state, pending_action="new_game_ai"))
 
     def _get_ui_state(self) -> StreamlitUiState:
         """Return the current transient UI state."""

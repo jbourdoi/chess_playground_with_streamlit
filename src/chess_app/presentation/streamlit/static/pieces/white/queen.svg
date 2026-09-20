@@ -1,10 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg"
-     viewBox="0 0 256 256"
-     role="img"
-     aria-label="white queen">
-  <g fill="#f6f0df" stroke="#232323" stroke-width="8"
-     stroke-linejoin="round" stroke-linecap="round">
-    <path d="M61 78L88 133L104 82L128 127L152 82L168 133L195 78L184 155H72Z"/><circle cx="61" cy="67" r="12"/><circle cx="104" cy="57" r="12"/><circle cx="152" cy="57" r="12"/><circle cx="195" cy="67" r="12"/><circle cx="128" cy="47" r="12"/><path d="M75 158H181L191 177H65Z"/><path d="M55 183H201Q210 183 212 193L214 204Q216 214 204 216H52Q40 214 42 204L44 193Q46 183 55 183Z"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="45" height="45">
+  <g style="fill:#ffffff;stroke:#000000;stroke-width:1.5;stroke-linejoin:round">
+    <path d="M 9,26 C 17.5,24.5 30,24.5 36,26 L 38.5,13.5 L 31,25 L 30.7,10.9 L 25.5,24.5 L 22.5,10 L 19.5,24.5 L 14.3,10.9 L 14,25 L 6.5,13.5 L 9,26 z"/>
+    <path d="M 9,26 C 9,28 10.5,28 11.5,30 C 12.5,31.5 12.5,31 12,33.5 C 10.5,34.5 11,36 11,36 C 9.5,37.5 11,38.5 11,38.5 C 17.5,39.5 27.5,39.5 34,38.5 C 34,38.5 35.5,37.5 34,36 C 34,36 34.5,34.5 33,33.5 C 32.5,31 32.5,31.5 33.5,30 C 34.5,28 36,28 36,26 C 27.5,24.5 17.5,24.5 9,26 z"/>
+    <path d="M 11.5,30 C 15,29 30,29 33.5,30" style="fill:none"/>
+    <path d="M 12,33.5 C 18,32.5 27,32.5 33,33.5" style="fill:none"/>
+    <circle cx="6" cy="12" r="2" />
+    <circle cx="14" cy="9" r="2" />
+    <circle cx="22.5" cy="8" r="2" />
+    <circle cx="31" cy="9" r="2" />
+    <circle cx="39" cy="12" r="2" />
   </g>
 </svg>

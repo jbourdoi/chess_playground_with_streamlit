@@ -13,23 +13,45 @@ def render_controls(
     game: GameState,
     on_suspend: Callable[[], None],
     on_resume: Callable[[], None],
+    on_new_game_local: Callable[[], None] | None = None,
+    on_new_game_ai: Callable[[], None] | None = None,
 ) -> None:
     """Render game controls."""
-    if game.status not in {"in_progress", "suspended"}:
-        return
-
     with st.container(key="game_controls"):
-        if game.status == "in_progress":
-            st.button(
-                "Suspend",
-                key=f"suspend-{game.game_id}",
-                on_click=on_suspend,
-                icon=":material/pause:",
-            )
-        else:
-            st.button(
-                "Resume",
-                key=f"resume-{game.game_id}",
-                on_click=on_resume,
-                icon=":material/play_arrow:",
-            )
+        col1, col2 = st.columns(2)
+        with col1:
+            if on_new_game_local:
+                st.button(
+                    "2 Players (Local)",
+                    key=f"new-local-{game.game_id}",
+                    on_click=on_new_game_local,
+                    icon=":material/groups:",
+                    use_container_width=True,
+                )
+        with col2:
+            if on_new_game_ai:
+                st.button(
+                    "Vs IA",
+                    key=f"new-ai-{game.game_id}",
+                    on_click=on_new_game_ai,
+                    icon=":material/smart_toy:",
+                    use_container_width=True,
+                )
+
+        if game.status in {"in_progress", "suspended"}:
+            if game.status == "in_progress":
+                st.button(
+                    "Suspend",
+                    key=f"suspend-{game.game_id}",
+                    on_click=on_suspend,
+                    icon=":material/pause:",
+                    use_container_width=True,
+                )
+            else:
+                st.button(
+                    "Resume",
+                    key=f"resume-{game.game_id}",
+                    on_click=on_resume,
+                    icon=":material/play_arrow:",
+                    use_container_width=True,
+                )

@@ -11,3 +11,4 @@ htmlcov/
 data/*.db
 data/*.sqlite
 snapshot/
+*_old.*

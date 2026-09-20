@@ -180,20 +180,21 @@ def create_initial_game(
     dependencies: AppDependencies,
     context: ApplicationContext,
 ) -> ApplicationState:
-    """Create the initial local game."""
+    """Create the initial local 2-player game by default."""
     new_game = NewGame(
         white_player=PlayerSpec(
             player_id=context.user.user_id,
-            name=context.user.username,
+            name=f"{context.user.username} (Blancs)",
             color=Color.WHITE,
             player_type=PlayerType.HUMAN,
             user_id=context.user.user_id,
         ),
         black_player=PlayerSpec(
             player_id=uuid4(),
-            name="ChessBot",
+            name=f"{context.user.username} (Noirs)",
             color=Color.BLACK,
-            player_type=PlayerType.AI,
+            player_type=PlayerType.HUMAN,
+            user_id=context.user.user_id,
         ),
     )
 
@@ -238,6 +239,14 @@ def main() -> None:
         page_title="Chess",
         page_icon="♟",
         layout="wide",
+        menu_items={
+            "About": (
+                "Chess piece artwork: "
+                "[Cburnett](https://commons.wikimedia.org/wiki/User:Cburnett), "
+                "CC BY-SA 3.0. "
+                "[Source](https://en.wikipedia.org/wiki/Chess_piece)"
+            ),
+        },
     )
 
     dependencies = build_dependencies(
