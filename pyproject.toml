@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "chess-streamlit"
 version = "0.1.0"
 description = "Chess game built with Streamlit using an MVC-inspired architecture"
-requires-python = ">=3.10,<3.11"
+requires-python = ">=3.10"
 dependencies = [
     "streamlit==1.64.0",
 ]
