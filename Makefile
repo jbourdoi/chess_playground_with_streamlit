@@ -8,7 +8,23 @@ SRC := src
 TESTS := tests
 APP := $(SRC)/chess_app/presentation/streamlit/app.py
 
-.PHONY: install test lint format typecheck snapshot headers pipeline run clean fclean
+.PHONY: help install test lint format typecheck snapshot headers pipeline run clean fclean
+
+help:
+	@echo "Available commands:"
+	@echo ""
+	@echo " install 	Create the virtual environment and install dependencies"
+	@echo " test 		Run the test suite"
+	@echo " lint 		Check code with Ruff"
+	@echo " format 	Format the code with Ruff"
+	@echo " typecheck 	Run static type checking with mypy"
+	@echo " snapshot 	Generate source and test snapshots"
+	@echo " headers 	Check required file headers"
+	@echo " pipeline 	Run the complete project pipeline"
+	@echo " run 		Start the Streamlit application"
+	@echo " clean 		Remove caches and temporary files"
+	@echo " fclean 	Remove the virtual environment and generated files"
+	@echo ""
 
 install:
 	$(PYTHON) -m venv $(VENV)
