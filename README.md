@@ -2,6 +2,10 @@
 
 A web-based chess game built with **Python**, **Streamlit**, and a layered architecture separating the domain, application, infrastructure, and presentation layers.
 
+## 🎮 Application
+
+![Chess application](assets/screenshot.png)
+
 ## Requirements
 
 * **Python 3.10 or newer**
