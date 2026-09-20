@@ -1,0 +1,23 @@
+/* src/chess_app/presentation/streamlit/static/css/header.css */
+
+.stMainBlockContainer {
+    padding: 2rem 2rem 2rem 2rem;
+}
+
+.app-header {
+    margin-bottom: 1rem;
+}
+
+.app-title {
+    margin: 0;
+
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.app-subtitle {
+    margin-top: 0.25rem;
+
+    font-size: 0.95rem;
+    opacity: 0.7;
+}

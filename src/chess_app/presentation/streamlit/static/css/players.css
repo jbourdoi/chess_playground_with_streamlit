@@ -1,0 +1,32 @@
+/* src/chess_app/presentation/streamlit/static/css/players.css */
+
+.players {
+    margin-bottom: 1rem;
+}
+
+.player-card {
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 1rem;
+
+    border: 1px solid rgba(128, 128, 128, 0.25);
+    border-radius: 0.5rem;
+}
+
+.player-name {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.player-color {
+    margin-top: 0.2rem;
+
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+.player-type {
+    margin-top: 0.2rem;
+
+    font-size: 0.8rem;
+    opacity: 0.6;
+}

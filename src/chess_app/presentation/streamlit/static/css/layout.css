@@ -1,0 +1,10 @@
+/* src/chess_app/presentation/streamlit/static/css/layout.css */
+
+
+.stHorizontalBlock {
+	gap: 2rem !important;
+}
+
+.stVerticalBlock {
+	gap: 0.5rem;
+}

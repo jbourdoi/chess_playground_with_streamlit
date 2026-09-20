@@ -1,0 +1,17 @@
+/* src/chess_app/presentation/streamlit/static/css/promotion.css */
+
+.promotion {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.promotion-title {
+    margin-bottom: 0.5rem;
+
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.promotion-option {
+    text-align: center;
+}

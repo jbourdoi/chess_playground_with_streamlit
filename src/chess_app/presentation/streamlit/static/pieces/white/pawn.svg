@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 256 256"
+     role="img"
+     aria-label="white pawn">
+  <g fill="#f6f0df" stroke="#232323" stroke-width="8"
+     stroke-linejoin="round" stroke-linecap="round">
+    <circle cx="128" cy="58" r="28"/><path d="M105 87C105 101 99 112 91 124C84 135 79 145 78 158H178C177 145 172 135 165 124C157 112 151 101 151 87Z"/><path d="M69 163C68 174 62 181 55 190H201C194 181 188 174 187 163Z"/><path d="M48 193Q44 198 46 208Q48 216 56 216H200Q208 216 210 208Q212 198 208 193Z"/>
+  </g>
+</svg>

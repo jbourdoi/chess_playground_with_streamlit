@@ -8,7 +8,7 @@ SRC := src
 TESTS := tests
 APP := $(SRC)/chess_app/presentation/streamlit/app.py
 
-.PHONY: install test lint format typecheck run clean fclean
+.PHONY: install test lint format typecheck snapshot headers pipeline run clean fclean
 
 install:
 	$(PYTHON) -m venv $(VENV)
@@ -30,12 +30,25 @@ typecheck:
 	$(PYTHON_BIN) -m mypy --strict $(SRC)
 
 snapshot:
-	cat src/*/*.py src/*/*/*.py > sources.py
-	cat tests/*/*.py > tests.py
-	wc -l sources.py tests.py
+	cat src/chess_app/domain/*.py \
+		src/chess_app/application/*.py \
+		src/chess_app/ports/*.py \
+		src/chess_app/infrastructure/persistence/*py \
+		src/chess_app/infrastructure/session/*.py 						> snapshot/sources.py
+
+	cat tests/*/*.py 													> snapshot/tests.py
+
+	cat src/chess_app/presentation/streamlit/*.py \
+		src/chess_app/presentation/streamlit/components/*.py						> snapshot/streamlit_impl.py
+
+	cat src/chess_app/presentation/streamlit/static/css/*.css			> snapshot/streamlit_styles.css
+
+	wc -l snapshot/sources.py snapshot/tests.py snapshot/streamlit_impl.py snapshot/streamlit_styles.css
+
 
 headers:
 	bash scripts/check_python_headers.sh
+	bash scripts/check_css_headers.sh
 
 pipeline: headers format lint typecheck test snapshot run
 

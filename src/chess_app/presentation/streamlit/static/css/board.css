@@ -1,0 +1,169 @@
+/* src/chess_app/presentation/streamlit/static/css/board.css */
+
+/* ---------------------------------------------------------
+   Conteneur global de l'échiquier
+   --------------------------------------------------------- */
+.st-key-chess_board_container {
+    max-width: 560px !important;
+    margin: 0 auto !important;
+    padding: 12px !important;
+    background-color: #262421;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.st-key-chess_board_container div[data-testid="stVerticalBlock"],
+.st-key-chess_board_container div[data-testid="stHorizontalBlock"],
+.st-key-chess_board_container div[data-testid="column"] {
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ---------------------------------------------------------
+   Style de base des boutons (Cases de l'échiquier)
+   --------------------------------------------------------- */
+[class*="st-key-sq-"] {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+[class*="st-key-sq-"] div[data-testid="stButton"] {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+}
+
+[class*="st-key-sq-"] div[data-testid="stButton"] > button {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    transition: filter 100ms ease;
+}
+
+[class*="st-key-sq-"] div[data-testid="stButton"] > button:hover {
+    filter: brightness(1.08);
+}
+
+[class*="st-key-sq-"] div[data-testid="stButton"] > button:focus-visible {
+    outline: 2px solid #3b82f6 !important;
+    outline-offset: -2px !important;
+    z-index: 10;
+}
+
+/* Cache le texte du libellé du bouton */
+[class*="st-key-sq-"] div[data-testid="stButton"] > button p {
+    display: none !important;
+}
+
+/* ---------------------------------------------------------
+   Cases claires (#f0d9b5)
+   --------------------------------------------------------- */
+.st-key-sq-a1 div[data-testid="stButton"] > button,
+.st-key-sq-c1 div[data-testid="stButton"] > button,
+.st-key-sq-e1 div[data-testid="stButton"] > button,
+.st-key-sq-g1 div[data-testid="stButton"] > button,
+.st-key-sq-b2 div[data-testid="stButton"] > button,
+.st-key-sq-d2 div[data-testid="stButton"] > button,
+.st-key-sq-f2 div[data-testid="stButton"] > button,
+.st-key-sq-h2 div[data-testid="stButton"] > button,
+.st-key-sq-a3 div[data-testid="stButton"] > button,
+.st-key-sq-c3 div[data-testid="stButton"] > button,
+.st-key-sq-e3 div[data-testid="stButton"] > button,
+.st-key-sq-g3 div[data-testid="stButton"] > button,
+.st-key-sq-b4 div[data-testid="stButton"] > button,
+.st-key-sq-d4 div[data-testid="stButton"] > button,
+.st-key-sq-f4 div[data-testid="stButton"] > button,
+.st-key-sq-h4 div[data-testid="stButton"] > button,
+.st-key-sq-a5 div[data-testid="stButton"] > button,
+.st-key-sq-c5 div[data-testid="stButton"] > button,
+.st-key-sq-e5 div[data-testid="stButton"] > button,
+.st-key-sq-g5 div[data-testid="stButton"] > button,
+.st-key-sq-b6 div[data-testid="stButton"] > button,
+.st-key-sq-d6 div[data-testid="stButton"] > button,
+.st-key-sq-f6 div[data-testid="stButton"] > button,
+.st-key-sq-h6 div[data-testid="stButton"] > button,
+.st-key-sq-a7 div[data-testid="stButton"] > button,
+.st-key-sq-c7 div[data-testid="stButton"] > button,
+.st-key-sq-e7 div[data-testid="stButton"] > button,
+.st-key-sq-g7 div[data-testid="stButton"] > button,
+.st-key-sq-b8 div[data-testid="stButton"] > button,
+.st-key-sq-d8 div[data-testid="stButton"] > button,
+.st-key-sq-f8 div[data-testid="stButton"] > button,
+.st-key-sq-h8 div[data-testid="stButton"] > button {
+    background-color: #f0d9b5 !important;
+}
+
+/* ---------------------------------------------------------
+   Cases sombres (#b58863)
+   --------------------------------------------------------- */
+.st-key-sq-b1 div[data-testid="stButton"] > button,
+.st-key-sq-d1 div[data-testid="stButton"] > button,
+.st-key-sq-f1 div[data-testid="stButton"] > button,
+.st-key-sq-h1 div[data-testid="stButton"] > button,
+.st-key-sq-a2 div[data-testid="stButton"] > button,
+.st-key-sq-c2 div[data-testid="stButton"] > button,
+.st-key-sq-e2 div[data-testid="stButton"] > button,
+.st-key-sq-g2 div[data-testid="stButton"] > button,
+.st-key-sq-b3 div[data-testid="stButton"] > button,
+.st-key-sq-d3 div[data-testid="stButton"] > button,
+.st-key-sq-f3 div[data-testid="stButton"] > button,
+.st-key-sq-h3 div[data-testid="stButton"] > button,
+.st-key-sq-a4 div[data-testid="stButton"] > button,
+.st-key-sq-c4 div[data-testid="stButton"] > button,
+.st-key-sq-e4 div[data-testid="stButton"] > button,
+.st-key-sq-g4 div[data-testid="stButton"] > button,
+.st-key-sq-b5 div[data-testid="stButton"] > button,
+.st-key-sq-d5 div[data-testid="stButton"] > button,
+.st-key-sq-f5 div[data-testid="stButton"] > button,
+.st-key-sq-h5 div[data-testid="stButton"] > button,
+.st-key-sq-a6 div[data-testid="stButton"] > button,
+.st-key-sq-c6 div[data-testid="stButton"] > button,
+.st-key-sq-e6 div[data-testid="stButton"] > button,
+.st-key-sq-g6 div[data-testid="stButton"] > button,
+.st-key-sq-b7 div[data-testid="stButton"] > button,
+.st-key-sq-d7 div[data-testid="stButton"] > button,
+.st-key-sq-f7 div[data-testid="stButton"] > button,
+.st-key-sq-h7 div[data-testid="stButton"] > button,
+.st-key-sq-a8 div[data-testid="stButton"] > button,
+.st-key-sq-c8 div[data-testid="stButton"] > button,
+.st-key-sq-e8 div[data-testid="stButton"] > button,
+.st-key-sq-g8 div[data-testid="stButton"] > button {
+    background-color: #b58863 !important;
+}
+
+/* ---------------------------------------------------------
+   Coordonnées (Rangées 1-8 et Colonnes a-h)
+   --------------------------------------------------------- */
+.board-rank-coordinate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #9e9e9e;
+    font-size: 0.8rem;
+    font-weight: 700;
+    user-select: none;
+}
+
+.board-file-coordinate {
+    text-align: center;
+    padding-top: 4px;
+    color: #9e9e9e;
+    font-size: 0.8rem;
+    font-weight: 700;
+    user-select: none;
+}

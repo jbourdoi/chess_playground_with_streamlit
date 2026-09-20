@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 256 256"
+     role="img"
+     aria-label="black rook">
+  <g fill="#2f3034" stroke="#111111" stroke-width="8"
+     stroke-linejoin="round" stroke-linecap="round">
+    <path d="M74 53V91L91 101L96 159H160L165 101L182 91V53H160V69H142V53H114V69H96V53Z"/><path d="M83 162H173L185 178H71Z"/><path d="M64 183H192Q201 183 205 193L208 205Q209 214 199 216H57Q47 214 48 205L51 193Q55 183 64 183Z"/>
+  </g>
+</svg>

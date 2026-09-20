@@ -1,0 +1,9 @@
+/* src/chess_app/presentation/streamlit/static/css/messages.css */
+
+.app-message {
+    margin-bottom: 1rem;
+}
+
+.app-error {
+    margin-bottom: 1rem;
+}

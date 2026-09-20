@@ -1,0 +1,33 @@
+/* src/chess_app/presentation/streamlit/static/css/controls.css */
+
+.game-controls {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.game-controls-title {
+    margin-bottom: 0.5rem;
+
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+
+/*
+ * Do NOT apply width: 100% globally to Streamlit buttons here.
+ *
+ * Board buttons are styled separately in board.css.
+ */
+
+.game-controls
+div[data-testid="stButton"] {
+    margin-bottom: 0.5rem;
+}
+
+.game-controls
+div[data-testid="stButton"] > button {
+    width: auto;
+    min-height: 0;
+
+    padding: 0.4rem 1rem;
+}

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 256 256"
+     role="img"
+     aria-label="black queen">
+  <g fill="#2f3034" stroke="#111111" stroke-width="8"
+     stroke-linejoin="round" stroke-linecap="round">
+    <path d="M61 78L88 133L104 82L128 127L152 82L168 133L195 78L184 155H72Z"/><circle cx="61" cy="67" r="12"/><circle cx="104" cy="57" r="12"/><circle cx="152" cy="57" r="12"/><circle cx="195" cy="67" r="12"/><circle cx="128" cy="47" r="12"/><path d="M75 158H181L191 177H65Z"/><path d="M55 183H201Q210 183 212 193L214 204Q216 214 204 216H52Q40 214 42 204L44 193Q46 183 55 183Z"/>
+  </g>
+</svg>

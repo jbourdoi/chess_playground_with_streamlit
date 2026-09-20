@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 256 256"
+     role="img"
+     aria-label="white king">
+  <g fill="#f6f0df" stroke="#232323" stroke-width="8"
+     stroke-linejoin="round" stroke-linecap="round">
+    <path d="M119 43V28H137V43H153V61H137V79H119V61H103V43Z"/><path d="M82 119C82 95 101 82 128 82C155 82 174 95 174 119C174 136 164 146 155 158H101C92 146 82 136 82 119Z"/><path d="M76 160H180L191 178H65Z"/><path d="M55 183H201Q210 183 212 193L214 204Q216 214 204 216H52Q40 214 42 204L44 193Q46 183 55 183Z"/>
+  </g>
+</svg>

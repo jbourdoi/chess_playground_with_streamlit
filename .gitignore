@@ -10,5 +10,4 @@ htmlcov/
 .streamlit/secrets.toml
 data/*.db
 data/*.sqlite
-tests.py
-sources.py
+snapshot/

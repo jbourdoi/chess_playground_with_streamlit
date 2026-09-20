@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 256 256"
+     role="img"
+     aria-label="black knight">
+  <g fill="#2f3034" stroke="#111111" stroke-width="8"
+     stroke-linejoin="round" stroke-linecap="round">
+    <path d="M83 204C82 190 88 178 98 169C108 160 116 149 117 137C118 124 114 113 108 103C103 94 101 82 107 70C116 52 132 42 149 45C158 47 166 52 173 59L156 72C167 85 172 101 170 116C168 135 159 151 148 163C138 174 132 184 132 197H173L187 208H69Q70 205 83 204Z"/><path d="M139 68C146 66 153 68 158 72"/><path d="M124 84C130 80 137 80 143 83"/>
+  </g>
+</svg>
