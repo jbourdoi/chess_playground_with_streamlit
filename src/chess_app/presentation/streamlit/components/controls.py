@@ -15,18 +15,21 @@ def render_controls(
     on_resume: Callable[[], None],
 ) -> None:
     """Render game controls."""
-    st.markdown("### Actions")
+    if game.status not in {"in_progress", "suspended"}:
+        return
 
-    if game.status == "in_progress":
-        st.button(
-            "⏸ Suspend",
-            key=f"suspend-{game.game_id}",
-            on_click=on_suspend,
-        )
-
-    elif game.status == "suspended":
-        st.button(
-            "▶ Resume",
-            key=f"resume-{game.game_id}",
-            on_click=on_resume,
-        )
+    with st.container(key="game_controls"):
+        if game.status == "in_progress":
+            st.button(
+                "Suspend",
+                key=f"suspend-{game.game_id}",
+                on_click=on_suspend,
+                icon=":material/pause:",
+            )
+        else:
+            st.button(
+                "Resume",
+                key=f"resume-{game.game_id}",
+                on_click=on_resume,
+                icon=":material/play_arrow:",
+            )

@@ -2,48 +2,41 @@
 
 from __future__ import annotations
 
+from html import escape
+
 import streamlit as st
 
-from chess_app.application.state import GameState
+from chess_app.application.state import GameState, PlayerState
 from chess_app.domain.player import PlayerType
 
 
 def render_players(game: GameState) -> None:
-    """Render the players."""
-    st.markdown("### Players")
+    """Render the two players, highlighting the one whose turn it is."""
+    active_color = game.turn if game.status == "in_progress" else None
 
-    _render_player_card(
-        symbol="♔",
-        color_name="White",
-        name=game.white_player.name,
-        player_type=game.white_player.player_type,
+    cards = "".join(
+        _player_card(player, is_active=(player.color == active_color))
+        for player in (game.white_player, game.black_player)
     )
 
-    _render_player_card(
-        symbol="♚",
-        color_name="Black",
-        name=game.black_player.name,
-        player_type=game.black_player.player_type,
-    )
+    st.html(f'<div class="players">{cards}</div>')
 
 
-def _render_player_card(
-    symbol: str,
-    color_name: str,
-    name: str,
-    player_type: str,
-) -> None:
-    """Render one player card."""
-    type_label = "AI" if player_type == PlayerType.AI.value else "Player"
+def _player_card(player: PlayerState, is_active: bool) -> str:
+    """Return the HTML of one player card."""
+    type_label = "AI" if player.player_type == PlayerType.AI.value else "Player"
+    modifier = " player-card--active" if is_active else ""
+    turn = '<span class="player-turn">To move</span>' if is_active else ""
 
-    st.markdown(
-        '<div class="player-card">'
-        '<div class="player-name">'
-        f"{symbol} {name}"
+    return (
+        f'<div class="player-card{modifier}">'
+        f'<span class="player-avatar player-avatar--{player.color}" '
+        f'role="img" aria-label="{player.color} king"></span>'
+        '<div class="player-info">'
+        f'<div class="player-name">{escape(player.name)}</div>'
+        f'<div class="player-color">'
+        f"{player.color.capitalize()} · {type_label}</div>"
         "</div>"
-        '<div class="player-type">'
-        f"{color_name} · {type_label}"
+        f"{turn}"
         "</div>"
-        "</div>",
-        unsafe_allow_html=True,
     )

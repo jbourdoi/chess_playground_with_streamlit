@@ -5,14 +5,9 @@ import streamlit as st
 
 def render_header() -> None:
     """Render the application header."""
-    st.markdown(
-        '<div class="chess-title"><h1>♟ Chess</h1></div>',
-        unsafe_allow_html=True,
-    )
-
-    st.markdown(
-        '<div class="chess-subtitle">'
-        "Play, suspend and resume your games."
-        "</div>",
-        unsafe_allow_html=True,
+    st.html(
+        '<div class="app-header">'
+        '<h1 class="app-title">♟ Chess</h1>'
+        '<p class="app-subtitle">Play, suspend and resume your games.</p>'
+        "</div>"
     )

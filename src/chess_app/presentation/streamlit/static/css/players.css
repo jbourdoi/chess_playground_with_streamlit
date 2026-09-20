@@ -1,32 +1,82 @@
 /* src/chess_app/presentation/streamlit/static/css/players.css */
 
 .players {
-    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .player-card {
-    margin-bottom: 0.75rem;
-    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 
-    border: 1px solid rgba(128, 128, 128, 0.25);
-    border-radius: 0.5rem;
+    padding: 0.6rem 0.75rem;
+
+    border: 1px solid var(--panel-border);
+    border-radius: 0.6rem;
+    background: var(--panel-surface);
+}
+
+/* Joueur dont c'est le tour */
+.player-card--active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+/* Roi sur une case du plateau : mêmes couleurs et mêmes images que le board */
+.player-avatar {
+    flex: none;
+    width: 2.6rem;
+    aspect-ratio: 1 / 1;
+
+    border-radius: 0.45rem;
+    background-size: 88% 88%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.player-avatar--white {
+    background-color: var(--sq-dark);
+    background-image: var(--piece-white-king);
+}
+
+.player-avatar--black {
+    background-color: var(--sq-light);
+    background-image: var(--piece-black-king);
+}
+
+.player-info {
+    flex: 1;
+    min-width: 0;
 }
 
 .player-name {
+    overflow: hidden;
+
     font-size: 1rem;
     font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .player-color {
-    margin-top: 0.2rem;
+    margin-top: 0.15rem;
 
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     opacity: 0.7;
 }
 
-.player-type {
-    margin-top: 0.2rem;
+.player-turn {
+    flex: none;
 
-    font-size: 0.8rem;
-    opacity: 0.6;
+    padding: 0.15rem 0.55rem;
+
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+
+    font-size: 0.75rem;
+    font-weight: 600;
 }

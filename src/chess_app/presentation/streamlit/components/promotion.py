@@ -23,15 +23,6 @@ def render_promotion(
 
     source, target = pending_promotion
 
-    st.markdown(
-        '<div class="promotion-box">',
-        unsafe_allow_html=True,
-    )
-
-    st.markdown("### Promotion")
-
-    st.write(f"{source} → {target}")
-
     promotion_labels = {
         "q": "Queen",
         "r": "Rook",
@@ -39,26 +30,29 @@ def render_promotion(
         "n": "Knight",
     }
 
-    selected = st.selectbox(
-        "Piece",
-        options=tuple(promotion_labels),
-        format_func=promotion_labels.__getitem__,
-        key=(f"promotion-{game.game_id}-{target}"),
-    )
+    # A keyed container is the reliable way to style a group of widgets:
+    # an HTML <div> opened in one st.markdown() call cannot wrap the next ones.
+    with st.container(key="promotion"):
+        st.html(
+            '<div class="promotion-title">Promotion</div>'
+            f'<div class="promotion-move">{source} → {target}</div>'
+        )
 
-    st.button(
-        "Confirm",
-        key=f"confirm-promotion-{game.game_id}",
-        on_click=on_promotion_selected,
-        args=(
-            source,
-            target,
-            selected,
-        ),
-        use_container_width=True,
-    )
+        selected = st.selectbox(
+            "Piece",
+            options=tuple(promotion_labels),
+            format_func=promotion_labels.__getitem__,
+            key=(f"promotion-{game.game_id}-{target}"),
+        )
 
-    st.markdown(
-        "</div>",
-        unsafe_allow_html=True,
-    )
+        st.button(
+            "Confirm",
+            key=f"confirm-promotion-{game.game_id}",
+            on_click=on_promotion_selected,
+            args=(
+                source,
+                target,
+                selected,
+            ),
+            use_container_width=True,
+        )

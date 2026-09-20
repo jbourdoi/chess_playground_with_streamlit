@@ -1,10 +1,15 @@
 /* src/chess_app/presentation/streamlit/static/css/layout.css */
 
-
-.stHorizontalBlock {
-	gap: 2rem !important;
+/* Couleurs de l'interface : neutres, elles suivent le thème clair/sombre */
+:root {
+    --panel-border: rgba(128, 128, 128, 0.3);
+    --panel-surface: rgba(128, 128, 128, 0.08);
+    --accent: #5f8f3a;
+    --warning: #d98e04;
+    --danger: #d64545;
 }
 
-.stVerticalBlock {
-	gap: 0.5rem;
+/* Rythme vertical du panneau de gauche */
+.st-key-side_panel {
+    gap: 0.9rem;
 }

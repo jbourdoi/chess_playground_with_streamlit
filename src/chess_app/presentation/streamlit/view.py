@@ -46,11 +46,11 @@ class StreamlitView(View):
         render_styles()
 
         left, right = st.columns(
-            [1, 1],
-            gap="large",
+            [5, 8],
+            gap="medium",
         )
 
-        with left:
+        with left, st.container(key="side_panel"):
             render_header()
 
             render_messages(
@@ -63,10 +63,10 @@ class StreamlitView(View):
                     state.game,
                 )
 
+                ui_state = self._get_ui_state()
+
                 render_players(state.game)
                 render_game_status(state.game)
-
-                ui_state = self._get_ui_state()
 
                 render_promotion(
                     game=state.game,

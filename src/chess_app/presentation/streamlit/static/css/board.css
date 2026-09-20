@@ -1,169 +1,197 @@
 /* src/chess_app/presentation/streamlit/static/css/board.css */
 
 /* ---------------------------------------------------------
-   Conteneur global de l'échiquier
+   Palette et surcouches du plateau
+   (les variables --piece-* sont générées par styles.py)
    --------------------------------------------------------- */
-.st-key-chess_board_container {
-    max-width: 560px !important;
-    margin: 0 auto !important;
-    padding: 12px !important;
-    background-color: #262421;
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+:root {
+    --sq-light: #f0d9b5;
+    --sq-dark: #b58863;
+    --board-frame: #262421;
+    --focus-ring: #3b82f6;
+
+    /* Surcouches de fond (dessinées sous la pièce) */
+    --hl-last: linear-gradient(rgba(155, 199, 0, 0.41), rgba(155, 199, 0, 0.41));
+    --hl-selected: linear-gradient(rgba(20, 85, 30, 0.5), rgba(20, 85, 30, 0.5));
+    --hl-check: radial-gradient(
+        ellipse at center,
+        rgba(255, 0, 0, 1) 0%,
+        rgba(231, 0, 0, 1) 25%,
+        rgba(169, 0, 0, 0) 89%
+    );
+
+    /* Indices de coups (dessinés au-dessus, dans ::after) */
+    --hint-move: radial-gradient(
+        circle closest-side,
+        rgba(20, 85, 30, 0.5) 0 28%,
+        transparent 32%
+    );
+    --hint-capture: radial-gradient(
+        transparent 0%,
+        transparent 79%,
+        rgba(20, 85, 30, 0.35) 80%
+    );
+
+    --hover-color: rgba(255, 255, 255, 0.6);
 }
 
-.st-key-chess_board_container div[data-testid="stVerticalBlock"],
-.st-key-chess_board_container div[data-testid="stHorizontalBlock"],
-.st-key-chess_board_container div[data-testid="column"] {
+/* ---------------------------------------------------------
+   Conteneur : une grille 8x8 de boutons.
+   .st-key-chess_board est le bloc vertical Streamlit lui-même,
+   d'où le display: grid !important pour battre son flex.
+   --------------------------------------------------------- */
+.st-key-chess_board {
+    display: grid !important;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
     gap: 0 !important;
-    margin: 0 !important;
+
+    /* Le plateau tient dans la fenêtre : jamais plus haut que l'écran */
+    width: min(100%, 44rem, calc(100vh - 7rem)) !important;
+    margin-inline: auto;
     padding: 0 !important;
+    box-sizing: border-box;
+
+    border: 10px solid var(--board-frame);
+    border-radius: 10px;
+    background: var(--board-frame);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+    overflow: hidden;
+
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+
+    /* Compteurs CSS pour les coordonnées (voir plus bas) */
+    counter-reset: rank 9 file 0;
 }
 
 /* ---------------------------------------------------------
-   Style de base des boutons (Cases de l'échiquier)
+   Une case = l'élément-conteneur de chaque bouton
+   Par défaut sombre ; les cases claires sont listées ci-dessous.
    --------------------------------------------------------- */
-[class*="st-key-sq-"] {
+.st-key-chess_board > div {
+    position: relative;
+    width: 100% !important;
+    min-width: 0;
     margin: 0 !important;
     padding: 0 !important;
+
+    --sq-bg: var(--sq-dark);
+    --sq-fg: var(--sq-light);
+
+    /* Pas de fondu "stale" de Streamlit pendant le rerun */
+    opacity: 1 !important;
+    transition: none !important;
 }
 
-[class*="st-key-sq-"] div[data-testid="stButton"] {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 100% !important;
+/* Cases claires : ordre DOM = a8..h8, a7..h7, ... (8 cases par rangée) */
+.st-key-chess_board > div:nth-child(16n + 1),
+.st-key-chess_board > div:nth-child(16n + 3),
+.st-key-chess_board > div:nth-child(16n + 5),
+.st-key-chess_board > div:nth-child(16n + 7),
+.st-key-chess_board > div:nth-child(16n + 10),
+.st-key-chess_board > div:nth-child(16n + 12),
+.st-key-chess_board > div:nth-child(16n + 14),
+.st-key-chess_board > div:nth-child(16n + 16) {
+    --sq-bg: var(--sq-light);
+    --sq-fg: var(--sq-dark);
 }
 
-[class*="st-key-sq-"] div[data-testid="stButton"] > button {
-    position: relative !important;
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 1 / 1 !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    border-radius: 0 !important;
-    color: transparent !important;
-    font-size: 0 !important;
-    line-height: 0 !important;
+/* ---------------------------------------------------------
+   Le bouton : carré, sans marge, dessiné par variables
+   (!important : Streamlit restyle le bouton en :hover/:active/
+   :focus/:disabled avec des sélecteurs plus spécifiques)
+   --------------------------------------------------------- */
+.st-key-chess_board [data-testid="stButton"] {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.st-key-chess_board button {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+
+    border: 0 !important;
+    border-radius: 0;
     box-shadow: none !important;
-    cursor: pointer;
-    transition: filter 100ms ease;
+    color: transparent !important;
+    opacity: 1 !important;
+
+    background-color: var(--sq-bg) !important;
+    background-image: var(--piece, none), var(--overlay, none);
+    background-size: 88% 88%, 100% 100%;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
+
+    cursor: var(--cursor, default) !important;
+    transition: none;
 }
 
-[class*="st-key-sq-"] div[data-testid="stButton"] > button:hover {
-    filter: brightness(1.08);
+/* Survol : anneau, uniquement sur les cases cliquables (--hover-ring) */
+.st-key-chess_board button:hover {
+    box-shadow: inset 0 0 0 4px var(--hover-ring, transparent) !important;
 }
 
-[class*="st-key-sq-"] div[data-testid="stButton"] > button:focus-visible {
-    outline: 2px solid #3b82f6 !important;
-    outline-offset: -2px !important;
-    z-index: 10;
+/* Le libellé (nom de la case) reste pour les lecteurs d'écran */
+.st-key-chess_board button > div {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
 
-/* Cache le texte du libellé du bouton */
-[class*="st-key-sq-"] div[data-testid="stButton"] > button p {
-    display: none !important;
+/* Indice de coup : point sur case vide, coins sur une capture */
+.st-key-chess_board button::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--hint, none);
+    pointer-events: none;
 }
 
-/* ---------------------------------------------------------
-   Cases claires (#f0d9b5)
-   --------------------------------------------------------- */
-.st-key-sq-a1 div[data-testid="stButton"] > button,
-.st-key-sq-c1 div[data-testid="stButton"] > button,
-.st-key-sq-e1 div[data-testid="stButton"] > button,
-.st-key-sq-g1 div[data-testid="stButton"] > button,
-.st-key-sq-b2 div[data-testid="stButton"] > button,
-.st-key-sq-d2 div[data-testid="stButton"] > button,
-.st-key-sq-f2 div[data-testid="stButton"] > button,
-.st-key-sq-h2 div[data-testid="stButton"] > button,
-.st-key-sq-a3 div[data-testid="stButton"] > button,
-.st-key-sq-c3 div[data-testid="stButton"] > button,
-.st-key-sq-e3 div[data-testid="stButton"] > button,
-.st-key-sq-g3 div[data-testid="stButton"] > button,
-.st-key-sq-b4 div[data-testid="stButton"] > button,
-.st-key-sq-d4 div[data-testid="stButton"] > button,
-.st-key-sq-f4 div[data-testid="stButton"] > button,
-.st-key-sq-h4 div[data-testid="stButton"] > button,
-.st-key-sq-a5 div[data-testid="stButton"] > button,
-.st-key-sq-c5 div[data-testid="stButton"] > button,
-.st-key-sq-e5 div[data-testid="stButton"] > button,
-.st-key-sq-g5 div[data-testid="stButton"] > button,
-.st-key-sq-b6 div[data-testid="stButton"] > button,
-.st-key-sq-d6 div[data-testid="stButton"] > button,
-.st-key-sq-f6 div[data-testid="stButton"] > button,
-.st-key-sq-h6 div[data-testid="stButton"] > button,
-.st-key-sq-a7 div[data-testid="stButton"] > button,
-.st-key-sq-c7 div[data-testid="stButton"] > button,
-.st-key-sq-e7 div[data-testid="stButton"] > button,
-.st-key-sq-g7 div[data-testid="stButton"] > button,
-.st-key-sq-b8 div[data-testid="stButton"] > button,
-.st-key-sq-d8 div[data-testid="stButton"] > button,
-.st-key-sq-f8 div[data-testid="stButton"] > button,
-.st-key-sq-h8 div[data-testid="stButton"] > button {
-    background-color: #f0d9b5 !important;
+.st-key-chess_board button:focus-visible {
+    outline: 3px solid var(--focus-ring) !important;
+    outline-offset: -3px !important;
+    z-index: 2;
 }
 
 /* ---------------------------------------------------------
-   Cases sombres (#b58863)
+   Coordonnées dessinées dans les cases (style Lichess) :
+   rangée sur la colonne a, colonne sur la rangée 1.
+   Deux compteurs CSS (rank décroît de 8 à 1, file va de a à h) :
+   pas besoin de lister 16 cases à la main. Chaque compteur vit dans
+   son propre pseudo-élément pour ne pas écraser l'autre.
    --------------------------------------------------------- */
-.st-key-sq-b1 div[data-testid="stButton"] > button,
-.st-key-sq-d1 div[data-testid="stButton"] > button,
-.st-key-sq-f1 div[data-testid="stButton"] > button,
-.st-key-sq-h1 div[data-testid="stButton"] > button,
-.st-key-sq-a2 div[data-testid="stButton"] > button,
-.st-key-sq-c2 div[data-testid="stButton"] > button,
-.st-key-sq-e2 div[data-testid="stButton"] > button,
-.st-key-sq-g2 div[data-testid="stButton"] > button,
-.st-key-sq-b3 div[data-testid="stButton"] > button,
-.st-key-sq-d3 div[data-testid="stButton"] > button,
-.st-key-sq-f3 div[data-testid="stButton"] > button,
-.st-key-sq-h3 div[data-testid="stButton"] > button,
-.st-key-sq-a4 div[data-testid="stButton"] > button,
-.st-key-sq-c4 div[data-testid="stButton"] > button,
-.st-key-sq-e4 div[data-testid="stButton"] > button,
-.st-key-sq-g4 div[data-testid="stButton"] > button,
-.st-key-sq-b5 div[data-testid="stButton"] > button,
-.st-key-sq-d5 div[data-testid="stButton"] > button,
-.st-key-sq-f5 div[data-testid="stButton"] > button,
-.st-key-sq-h5 div[data-testid="stButton"] > button,
-.st-key-sq-a6 div[data-testid="stButton"] > button,
-.st-key-sq-c6 div[data-testid="stButton"] > button,
-.st-key-sq-e6 div[data-testid="stButton"] > button,
-.st-key-sq-g6 div[data-testid="stButton"] > button,
-.st-key-sq-b7 div[data-testid="stButton"] > button,
-.st-key-sq-d7 div[data-testid="stButton"] > button,
-.st-key-sq-f7 div[data-testid="stButton"] > button,
-.st-key-sq-h7 div[data-testid="stButton"] > button,
-.st-key-sq-a8 div[data-testid="stButton"] > button,
-.st-key-sq-c8 div[data-testid="stButton"] > button,
-.st-key-sq-e8 div[data-testid="stButton"] > button,
-.st-key-sq-g8 div[data-testid="stButton"] > button {
-    background-color: #b58863 !important;
-}
-
-/* ---------------------------------------------------------
-   Coordonnées (Rangées 1-8 et Colonnes a-h)
-   --------------------------------------------------------- */
-.board-rank-coordinate {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: #9e9e9e;
-    font-size: 0.8rem;
+.st-key-chess_board > div:nth-child(8n + 1)::before,
+.st-key-chess_board > div:nth-child(n + 57)::after {
+    position: absolute;
+    z-index: 1;
+    font-size: 0.7rem;
     font-weight: 700;
-    user-select: none;
+    line-height: 1;
+    color: var(--sq-fg);
+    pointer-events: none;
 }
 
-.board-file-coordinate {
-    text-align: center;
-    padding-top: 4px;
-    color: #9e9e9e;
-    font-size: 0.8rem;
-    font-weight: 700;
-    user-select: none;
+.st-key-chess_board > div:nth-child(8n + 1)::before {
+    counter-increment: rank -1;
+    content: counter(rank);
+    top: 5%;
+    left: 6%;
+}
+
+.st-key-chess_board > div:nth-child(n + 57)::after {
+    counter-increment: file;
+    content: counter(file, lower-alpha);
+    right: 6%;
+    bottom: 5%;
 }

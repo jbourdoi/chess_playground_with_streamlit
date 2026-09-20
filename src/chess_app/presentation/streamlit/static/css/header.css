@@ -1,23 +1,29 @@
 /* src/chess_app/presentation/streamlit/static/css/header.css */
 
+/*
+ * La barre d'en-tête de Streamlit est fixe (~3.5rem) : le contenu doit
+ * commencer en dessous, sinon le haut du plateau passe derrière.
+ */
 .stMainBlockContainer {
-    padding: 2rem 2rem 2rem 2rem;
+    padding: 4.5rem 2rem 2rem 2rem;
 }
 
 .app-header {
-    margin-bottom: 1rem;
+    margin-bottom: 0.25rem;
 }
 
 .app-title {
     margin: 0;
+    padding: 0;
 
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
+    line-height: 1.2;
 }
 
 .app-subtitle {
-    margin-top: 0.25rem;
+    margin: 0.25rem 0 0;
 
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     opacity: 0.7;
 }

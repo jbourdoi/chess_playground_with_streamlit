@@ -1,26 +1,42 @@
 /* src/chess_app/presentation/streamlit/static/css/status.css */
 
 .game-status {
-    margin-bottom: 1rem;
-    padding: 0.75rem 1rem;
+    padding: 0.7rem 0.9rem;
 
-    border: 1px solid rgba(128, 128, 128, 0.25);
-    border-radius: 0.5rem;
+    border: 1px solid var(--panel-border);
+    border-radius: 0.6rem;
 }
 
-.game-status-title {
-    margin-bottom: 0.25rem;
-
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-
-    opacity: 0.65;
-}
-
+/* Pastille de couleur avant le libellé (vert / ambre / gris) */
 .game-status-value {
-    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    font-size: 1.05rem;
     font-weight: 600;
+}
+
+.game-status-value::before {
+    content: "";
+    flex: none;
+    width: 0.6rem;
+    height: 0.6rem;
+
+    border-radius: 50%;
+    background: var(--status-color);
+}
+
+.game-status--live {
+    --status-color: var(--accent);
+}
+
+.game-status--paused {
+    --status-color: var(--warning);
+}
+
+.game-status--over {
+    --status-color: var(--panel-border);
 }
 
 .game-turn {
@@ -28,4 +44,16 @@
 
     font-size: 0.9rem;
     opacity: 0.75;
+}
+
+.game-check {
+    margin-top: 0.55rem;
+    padding: 0.35rem 0.6rem;
+
+    border-radius: 0.4rem;
+    background: color-mix(in srgb, var(--danger) 14%, transparent);
+    color: var(--danger);
+
+    font-size: 0.9rem;
+    font-weight: 600;
 }
