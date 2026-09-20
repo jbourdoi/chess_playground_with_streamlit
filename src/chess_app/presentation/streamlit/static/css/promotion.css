@@ -1,17 +1,79 @@
 /* src/chess_app/presentation/streamlit/static/css/promotion.css */
 
-.promotion {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+.st-key-promotion {
+    gap: 0.5rem;
+    padding: 0.75rem 0.9rem;
+
+    border: 1px solid var(--accent);
+    border-radius: 0.6rem;
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
 }
 
 .promotion-title {
-    margin-bottom: 0.5rem;
-
     font-size: 1rem;
     font-weight: 600;
 }
 
-.promotion-option {
-    text-align: center;
+.promotion-move {
+    font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+/* ---------------------------------------------------------
+   Les 4 choix : même technique que le plateau
+   (grille + pièce en image de fond, libellé pour lecteurs d'écran)
+   --------------------------------------------------------- */
+.st-key-promotion_choices {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.5rem !important;
+}
+
+.st-key-promotion_choices > div {
+    width: 100% !important;
+    min-width: 0;
+}
+
+.st-key-promotion_choices [data-testid="stButton"] {
+    width: 100%;
+}
+
+.st-key-promotion_choices button {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    min-height: 0;
+    padding: 0;
+
+    border: 1px solid var(--panel-border) !important;
+    border-radius: 0.5rem;
+    box-shadow: none !important;
+    color: transparent !important;
+
+    background-color: var(--promo-bg) !important;
+    background-image: var(--piece);
+    background-size: 88% 88%;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.st-key-promotion_choices button:hover {
+    box-shadow: 0 0 0 3px var(--accent) !important;
+}
+
+.st-key-promotion_choices button:focus-visible {
+    outline: 3px solid var(--focus-ring) !important;
+    outline-offset: 2px !important;
+}
+
+.st-key-promotion_choices button > div {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
 }

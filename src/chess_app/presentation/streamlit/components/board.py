@@ -136,7 +136,7 @@ def _board_state_css(
     # 7. Game not in progress: mute the whole board
     if not in_progress:
         rules.append(
-            ".st-key-chess_board { filter: saturate(0.6) brightness(0.92); }"
+            ".st-key-chess_board { filter: saturate(0.6) brightness(0.95); }"
         )
 
     return "\n".join(rules)

@@ -36,7 +36,7 @@
 }
 
 .game-status--over {
-    --status-color: var(--panel-border);
+    --status-color: rgba(128, 128, 128, 0.7);
 }
 
 .game-turn {

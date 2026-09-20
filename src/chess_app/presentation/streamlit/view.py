@@ -1,5 +1,4 @@
 # src/chess_app/presentation/streamlit/view.py
-
 from __future__ import annotations
 
 from dataclasses import replace

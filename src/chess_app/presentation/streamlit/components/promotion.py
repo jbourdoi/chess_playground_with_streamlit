@@ -8,6 +8,16 @@ import streamlit as st
 
 from chess_app.application.state import GameState
 
+from .styles import inject_css
+
+# (UCI suffix, piece type used for the SVG variable, label)
+_CHOICES = (
+    ("q", "queen", "Queen"),
+    ("r", "rook", "Rook"),
+    ("b", "bishop", "Bishop"),
+    ("n", "knight", "Knight"),
+)
+
 
 def render_promotion(
     game: GameState,
@@ -17,42 +27,38 @@ def render_promotion(
         None,
     ],
 ) -> None:
-    """Render the promotion selector."""
+    """Render the promotion picker: one click on the piece to promote to."""
     if pending_promotion is None:
         return
 
     source, target = pending_promotion
 
-    promotion_labels = {
-        "q": "Queen",
-        "r": "Rook",
-        "b": "Bishop",
-        "n": "Knight",
-    }
+    # The choices show the pieces of the side that is promoting. Like on the
+    # board, Python only sets CSS variables; promotion.css draws them.
+    tile = "--sq-dark" if game.turn == "white" else "--sq-light"
+
+    rules = [
+        f".st-key-promo-{code} "
+        f"{{ --piece: var(--piece-{game.turn}-{piece_type}); }}"
+        for code, piece_type, _ in _CHOICES
+    ]
+    rules.append(f".st-key-promotion_choices {{ --promo-bg: var({tile}); }}")
+
+    inject_css("\n".join(rules))
 
     # A keyed container is the reliable way to style a group of widgets:
     # an HTML <div> opened in one st.markdown() call cannot wrap the next ones.
     with st.container(key="promotion"):
         st.html(
-            '<div class="promotion-title">Promotion</div>'
+            '<div class="promotion-title">Promote to</div>'
             f'<div class="promotion-move">{source} → {target}</div>'
         )
 
-        selected = st.selectbox(
-            "Piece",
-            options=tuple(promotion_labels),
-            format_func=promotion_labels.__getitem__,
-            key=(f"promotion-{game.game_id}-{target}"),
-        )
-
-        st.button(
-            "Confirm",
-            key=f"confirm-promotion-{game.game_id}",
-            on_click=on_promotion_selected,
-            args=(
-                source,
-                target,
-                selected,
-            ),
-            use_container_width=True,
-        )
+        with st.container(key="promotion_choices"):
+            for code, _, label in _CHOICES:
+                st.button(
+                    label,
+                    key=f"promo-{code}",
+                    on_click=on_promotion_selected,
+                    args=(source, target, code),
+                )
