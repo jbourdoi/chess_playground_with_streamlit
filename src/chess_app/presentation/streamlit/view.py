@@ -9,6 +9,7 @@ import streamlit as st
 from chess_app.application.commands import (
     Command,
     NewGame,
+    PlayEngineMove,
     PlayerSpec,
     PlayMove,
     ResumeGame,
@@ -17,11 +18,11 @@ from chess_app.application.commands import (
 from chess_app.application.state import (
     ApplicationState,
     GameState,
+    is_ai_turn,
 )
 from chess_app.domain.move import Move
-from chess_app.domain.piece import Color, PieceType
+from chess_app.domain.piece import Color
 from chess_app.domain.player import PlayerType
-from chess_app.domain.square import Square
 from chess_app.ports.view import View
 
 from .components import (
@@ -82,6 +83,11 @@ class StreamlitView(View):
                     on_resume=self._queue_resume,
                     on_new_game_local=self._queue_new_game_local,
                     on_new_game_ai=self._queue_new_game_ai,
+                    on_engine_retry=(
+                        self._queue_engine_move
+                        if state.error is not None and is_ai_turn(state.game)
+                        else None
+                    ),
                 )
 
                 render_move_history(state.game)
@@ -166,11 +172,15 @@ class StreamlitView(View):
             self._clear_pending_action()
             return ResumeGame(game_id=game_id)
 
+        if ui_state.pending_action == "engine_move":
+            self._clear_pending_action()
+            return PlayEngineMove(game_id=game_id)
+
         if ui_state.pending_move_uci is None:
             return None
 
         uci = ui_state.pending_move_uci
-        move = self._move_from_uci(uci)
+        move = Move.from_uci(uci)
 
         self._set_ui_state(
             replace(
@@ -190,6 +200,10 @@ class StreamlitView(View):
         """Queue a new local 2-player game command."""
         ui_state = self._get_ui_state()
         self._set_ui_state(replace(ui_state, pending_action="new_game_local"))
+
+    def _queue_engine_move(self) -> None:
+        ui_state = self._get_ui_state()
+        self._set_ui_state(replace(ui_state, pending_action="engine_move"))
 
     def _queue_new_game_ai(self) -> None:
         """Queue a new game vs AI command."""
@@ -378,33 +392,3 @@ class StreamlitView(View):
     ) -> bool:
         """Return whether a square starts a legal move."""
         return any(move[:2] == square for move in legal_moves)
-
-    @staticmethod
-    def _move_from_uci(uci: str) -> Move:
-        """Build a domain Move from a UCI move."""
-        if len(uci) not in {4, 5}:
-            raise ValueError(f"invalid UCI move: {uci}")
-
-        source = Square.from_algebraic(uci[:2])
-        target = Square.from_algebraic(uci[2:4])
-
-        promotion = None
-
-        if len(uci) == 5:
-            promotion_types = {
-                "q": PieceType.QUEEN,
-                "r": PieceType.ROOK,
-                "b": PieceType.BISHOP,
-                "n": PieceType.KNIGHT,
-            }
-
-            promotion = promotion_types.get(uci[4].lower())
-
-            if promotion is None:
-                raise ValueError(f"invalid promotion: {uci}")
-
-        return Move(
-            source=source,
-            target=target,
-            promotion=promotion,
-        )

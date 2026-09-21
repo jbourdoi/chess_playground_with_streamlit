@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from chess_app.domain.game import Game
+from chess_app.domain.player import PlayerType
 
 
 @dataclass(frozen=True, slots=True)
@@ -123,3 +124,12 @@ def game_to_state(game: Game) -> GameState:
         in_check=game.in_check,
         legal_moves=tuple(move.uci for move in game.legal_moves),
     )
+
+
+def is_ai_turn(game: GameState) -> bool:
+    if game.status != "in_progress":
+        return False
+
+    player = game.white_player if game.turn == "white" else game.black_player
+
+    return player.player_type == PlayerType.AI.value

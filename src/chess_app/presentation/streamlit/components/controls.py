@@ -15,6 +15,7 @@ def render_controls(
     on_resume: Callable[[], None],
     on_new_game_local: Callable[[], None] | None = None,
     on_new_game_ai: Callable[[], None] | None = None,
+    on_engine_retry: Callable[[], None] | None = None,
 ) -> None:
     """Render game controls."""
     with st.container(key="game_controls"):
@@ -35,6 +36,14 @@ def render_controls(
                     key=f"new-ai-{game.game_id}",
                     on_click=on_new_game_ai,
                     icon=":material/smart_toy:",
+                    use_container_width=True,
+                )
+            if on_engine_retry:
+                st.button(
+                    "Relancer l'IA",
+                    key=f"engine-retry-{game.game_id}",
+                    on_click=on_engine_retry,
+                    icon=":material/refresh:",
                     use_container_width=True,
                 )
 

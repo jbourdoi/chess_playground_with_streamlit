@@ -6,12 +6,13 @@ import os
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import streamlit as st
 
 from chess_app.application.commands import (
     NewGame,
+    PlayEngineMove,
     PlayerSpec,
 )
 from chess_app.application.context import (
@@ -22,10 +23,12 @@ from chess_app.application.controller import Controller
 from chess_app.application.session_service import SessionService
 from chess_app.application.state import (
     ApplicationState,
+    is_ai_turn,
 )
 from chess_app.domain.piece import Color
 from chess_app.domain.player import PlayerType
 from chess_app.domain.user import User
+from chess_app.infrastructure.engine.chess_api_engine import ChessApiEngine
 from chess_app.infrastructure.persistence.sqlite_game_repository import (
     SQLiteGameRepository,
 )
@@ -35,10 +38,12 @@ from chess_app.infrastructure.persistence.sqlite_user_repository import (
 from chess_app.infrastructure.session.sqlite_session_repository import (
     SQLiteSessionRepository,
 )
+from chess_app.ports.move_engine import MoveEngine
 from chess_app.presentation.streamlit.view import StreamlitView
 
 DEFAULT_DB_PATH = Path("data/chess.db")
 DEFAULT_USERNAME = "local-player"
+DEFAULT_ENGINE_DEPTH = 8
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,6 +54,19 @@ class AppDependencies:
     session_service: SessionService
     user_repository: SQLiteUserRepository
     view: StreamlitView
+
+
+def get_engine_depth() -> int:
+    configured_depth = os.getenv("CHESS_ENGINE_DEPTH", "").strip()
+
+    if configured_depth.isdigit():
+        return int(configured_depth)
+
+    return DEFAULT_ENGINE_DEPTH
+
+
+def build_move_engine() -> MoveEngine:
+    return ChessApiEngine(depth=get_engine_depth())
 
 
 def get_database_path() -> Path:
@@ -102,7 +120,7 @@ def build_dependencies(
     )
 
     controller = Controller(
-        game_repository=game_repository,
+        game_repository=game_repository, move_engine=build_move_engine()
     )
 
     view = StreamlitView()
@@ -268,16 +286,24 @@ def main() -> None:
         state,
     )
 
+    if (
+        command is None
+        and state.game is not None
+        and state.error is None
+        and is_ai_turn(state.game)
+    ):
+        command = PlayEngineMove(game_id=UUID(state.game.game_id))
+
     if command is None:
         return
 
-    new_state = dependencies.controller.handle(
-        context,
-        command,
-    )
+    if isinstance(command, PlayEngineMove):
+        with st.spinner("L'IA réfléchit…"):
+            new_state = dependencies.controller.handle(context, command)
+    else:
+        new_state = dependencies.controller.handle(context, command)
 
     store_application_state(new_state)
-
     st.rerun()
 
 

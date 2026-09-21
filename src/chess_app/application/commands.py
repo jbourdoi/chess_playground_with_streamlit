@@ -67,4 +67,11 @@ class ResumeGame:
     game_id: UUID
 
 
-Command = NewGame | PlayMove | SuspendGame | ResumeGame
+@dataclass(frozen=True, slots=True)
+class PlayEngineMove:
+    """Request that the engine plays the move of the AI player to move."""
+
+    game_id: UUID
+
+
+Command = NewGame | PlayMove | PlayEngineMove | SuspendGame | ResumeGame

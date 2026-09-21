@@ -350,17 +350,61 @@ def next_castling_rights(
     return updated
 
 
+# def next_en_passant_target(
+#     move: Move,
+#     board: Board,
+# ) -> Square | None:
+#     """Return the en passant target produced by a move."""
+#     piece = board.piece_at(move.source)
+
+#     if piece is None or piece.type is not PieceType.PAWN:
+#         return None
+
+#     if abs(move.target.rank - move.source.rank) != 2:
+#         return None
+
+#     direction = 1 if piece.color is Color.WHITE else -1
+
+#     return move.source.offset(0, direction)
+
+
 def next_en_passant_target(
     move: Move,
     board: Board,
 ) -> Square | None:
-    """Return the en passant target produced by a move."""
+    """
+    Return the en passant target produced by a move.
+
+    The target square is set ONLY if an opponent pawn is on an adjacent
+    file at the destination rank, making an en passant capture possible.
+    """
     piece = board.piece_at(move.source)
 
     if piece is None or piece.type is not PieceType.PAWN:
         return None
 
     if abs(move.target.rank - move.source.rank) != 2:
+        return None
+
+    target_file = move.target.file
+    target_rank = move.target.rank
+    opponent_color = piece.color.opposite
+
+    # Vérifier s'il y a au moins un pion adverse sur les colonnes adjacentes
+    has_adjacent_enemy_pawn = False
+    for adj_file in (target_file - 1, target_file + 1):
+        if 0 <= adj_file <= 7:
+            adj_square = Square(file=adj_file, rank=target_rank)
+            adj_piece = board.piece_at(adj_square)
+            if (
+                adj_piece is not None
+                and adj_piece.type is PieceType.PAWN
+                and adj_piece.color is opponent_color
+            ):
+                has_adjacent_enemy_pawn = True
+                break
+
+    if not has_adjacent_enemy_pawn:
         return None
 
     direction = 1 if piece.color is Color.WHITE else -1

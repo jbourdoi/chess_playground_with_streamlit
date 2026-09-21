@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 from chess_app.application.commands import (
     Command,
     NewGame,
+    PlayEngineMove,
     PlayerSpec,
     PlayMove,
     ResumeGame,
@@ -23,9 +24,10 @@ from chess_app.application.state import (
     game_to_state,
 )
 from chess_app.domain.errors import ChessDomainError
-from chess_app.domain.game import Game
+from chess_app.domain.game import Game, GameStatus
 from chess_app.domain.player import Player, PlayerType
 from chess_app.ports.game_repository import GameRepository
+from chess_app.ports.move_engine import EngineError, MoveEngine
 
 
 class Controller:
@@ -35,6 +37,7 @@ class Controller:
         self,
         game_repository: GameRepository,
         game_id_factory: Callable[[], UUID] = uuid4,
+        move_engine: MoveEngine | None = None,
     ) -> None:
         """
         Initialize the controller.
@@ -44,6 +47,7 @@ class Controller:
         """
         self._game_repository = game_repository
         self._game_id_factory = game_id_factory
+        self._move_engine = move_engine
 
     def handle(
         self, context: ApplicationContext, command: Command
@@ -62,6 +66,12 @@ class Controller:
 
             case PlayMove():
                 return self._handle_play_move(
+                    context,
+                    command,
+                )
+
+            case PlayEngineMove():
+                return self._handle_play_engine_move(
                     context,
                     command,
                 )
@@ -160,6 +170,40 @@ class Controller:
             message="Game created.",
         )
 
+    def _handle_play_engine_move(
+        self, context: ApplicationContext, command: PlayEngineMove
+    ) -> ApplicationState:
+        result = self._load_authorized_game(context, command.game_id)
+
+        if isinstance(result, ApplicationState):
+            return result
+
+        game = result
+        engine = self._move_engine
+
+        if engine is None:
+            return self._error_state(game, "no move engine configured")
+
+        if game.status is not GameStatus.IN_PROGRESS:
+            return self._error_state(
+                game, "cannot play a move in the current game state"
+            )
+
+        if game.current_player.player_type is not PlayerType.AI:
+            return self._error_state(game, "it is not the engine's turn")
+
+        try:
+            move = engine.choose_move(game)
+        except EngineError as exc:
+            return self._error_state(game, f"engine failure: {exc}")
+
+        # Source non fiable : Game.play valide le coup.
+        return self._apply_game_update(
+            game,
+            lambda current_game: current_game.play(move),
+            f"Engine played: {move.uci}",
+        )
+
     def _handle_play_move(
         self,
         context: ApplicationContext,
@@ -250,6 +294,10 @@ class Controller:
             )
 
         return game
+
+    @staticmethod
+    def _error_state(game: Game, error: str) -> ApplicationState:
+        return ApplicationState(game=game_to_state(game), error=error)
 
     @staticmethod
     def _build_player(spec: PlayerSpec) -> Player:

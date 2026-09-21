@@ -7,6 +7,13 @@ from dataclasses import dataclass
 from .piece import PieceType
 from .square import Square
 
+_PROMOTION_BY_SYMBOL = {
+    "n": PieceType.KNIGHT,
+    "b": PieceType.BISHOP,
+    "r": PieceType.ROOK,
+    "q": PieceType.QUEEN,
+}
+
 
 @dataclass(frozen=True, slots=True)
 class Move:
@@ -43,3 +50,23 @@ class Move:
             result += promotion_symbols[self.promotion]
 
         return result
+
+    @classmethod
+    def from_uci(cls, uci: str) -> Move:
+        """Create a move from UCI notation (raise ValueError if invalid)."""
+        if len(uci) not in {4, 5}:
+            raise ValueError(f"invalid UCI move: {uci!r}")
+
+        promotion = None
+
+        if len(uci) == 5:
+            promotion = _PROMOTION_BY_SYMBOL.get(uci[4].lower())
+
+            if promotion is None:
+                raise ValueError(f"invalid promotion in UCI move: {uci!r}")
+
+        return cls(
+            source=Square.from_algebraic(uci[:2]),
+            target=Square.from_algebraic(uci[2:4]),
+            promotion=promotion,
+        )
